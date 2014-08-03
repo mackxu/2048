@@ -98,113 +98,26 @@ class App
 		})
 		return
 	
-	moveLeft: () -> 
-		if(moveCells = @board.moveLeft())
-			# 执行有滑动任务的数字块
-			for moveCell in moveCells
-				setTimeout(=>
-					@showMoveNumber moveCell 
-				, 25)
-			# 显示一个新的数字块
-			# @showOneNumber()
-			
-			# 刷新棋盘格
-			setTimeout( =>
-				@updateBoardView()
-			, 200)
-
-			setTimeout( => 
-				@showOneNumber()
-			, 250)
-		return
-	moveLeft: () ->
-		@board.moveLeft( => 
-			@showMoveNumber(arguments)
+	
+	moveCell: (moveAction) ->
+		canMove = @board[moveAction]( => 
+			@showMoveNumber arguments
 			return
 		)
-		# 刷新棋盘格
-		setTimeout( =>
-			@updateBoardView()
-			return 
-		, 200)
+		if canMove
+			# 刷新棋盘格
+			setTimeout( =>
+				@updateBoardView()
+				return 
+			, 500)
 
-		setTimeout( => 
-			@showOneNumber()
-			return
-		, 250)
+			setTimeout( => 
+				@showOneNumber()
+				return
+			, 750)
 		return
 			
-	moveRight: () ->
-		if(moveCells = @board.moveRight())
-			# 执行有滑动任务的数字块
-			for moveCell in moveCells
-				setTimeout(=>
-					@showMoveNumber moveCell 
-				, 25)
-			# 显示一个新的数字块
-			# @showOneNumber()
-			
-			# 刷新棋盘格
-			setTimeout( =>
-				@updateBoardView()
-			, 200)
-
-			setTimeout( => 
-				@showOneNumber()
-			, 250)
-		return 
-	moveRight: () ->
-		@board.moveRight( => 
-			@showMoveNumber(arguments)
-			return
-		)
-		# 刷新棋盘格
-		setTimeout( =>
-			@updateBoardView()
-		, 200)
-
-		setTimeout( => 
-			@showOneNumber()
-		, 250)
-		return
-	moveUp: () ->
-		if(moveCells = @board.moveUp())
-			# 执行有滑动任务的数字块
-			for moveCell in moveCells
-				setTimeout(=>
-					@showMoveNumber moveCell 
-				, 25)
-			# 显示一个新的数字块
-			# @showOneNumber()
-			
-			# 刷新棋盘格
-			setTimeout( =>
-				@updateBoardView()
-			, 200)
-
-			setTimeout( => 
-				@showOneNumber()
-			, 250)
-		return 
-	moveDown: () ->
-		if(moveCells = @board.moveDown())
-			# 执行有滑动任务的数字块
-			for moveCell in moveCells
-				setTimeout(=>
-					@showMoveNumber moveCell 
-				, 25)
-			# 显示一个新的数字块
-			# @showOneNumber()
-			
-			# 刷新棋盘格
-			setTimeout( =>
-				@updateBoardView()
-			, 200)
-
-			setTimeout( => 
-				@showOneNumber()
-			, 250)
-		return 
+	
 	showOneNumber: () ->
 		# console.log RandNumberCell = @board.generateOneNumber()
 		if(numberCell = @board.generateOneNumber())
@@ -256,28 +169,28 @@ $ ->
 		e.preventDefault()
 		switch e.which
 			when 37
-				appGame.moveLeft()
+				appGame.moveCell('moveLeft')
 				setTimeout( -> 
 					appGame.isGameOver()
 					return
 				, 300)
 				return
 			when 38
-				appGame.moveUp()
+				appGame.moveCell('moveUp')
 				setTimeout( -> 
 					appGame.isGameOver()
 					return
 				, 300)
 				return
 			when 39
-				appGame.moveRight()
+				appGame.moveCell('moveRight')
 				setTimeout( -> 
 					appGame.isGameOver()
 					return
 				, 300)
 				return
 			when 40
-				appGame.moveDown()
+				appGame.moveCell('moveDown')
 				setTimeout( -> 
 					appGame.isGameOver()
 					return

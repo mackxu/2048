@@ -28,7 +28,7 @@ class Board
 				break
 			randX = +Math.floor(Math.random() * 4)
 			randY = +Math.floor(Math.random() * 4)
-		console.log times + 'times'
+		# console.log times + 'times'
 		# 在随机位置上显示随机数字
 		randNumberCell.value = if Math.random() < 0.5 then 2 else 4
 		return randNumberCell

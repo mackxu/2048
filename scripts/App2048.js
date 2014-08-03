@@ -86,135 +86,24 @@ App = (function() {
     });
   };
 
-  App.prototype.moveLeft = function() {
-    var moveCell, moveCells, _i, _len;
-    if ((moveCells = this.board.moveLeft())) {
-      for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
-        moveCell = moveCells[_i];
-        setTimeout((function(_this) {
-          return function() {
-            return _this.showMoveNumber(moveCell);
-          };
-        })(this), 25);
-      }
-      setTimeout((function(_this) {
-        return function() {
-          return _this.updateBoardView();
-        };
-      })(this), 200);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.showOneNumber();
-        };
-      })(this), 250);
-    }
-  };
-
-  App.prototype.moveLeft = function() {
-    this.board.moveLeft((function(_this) {
+  App.prototype.moveCell = function(moveAction) {
+    var canMove;
+    canMove = this.board[moveAction]((function(_this) {
       return function() {
         _this.showMoveNumber(arguments);
       };
     })(this));
-    setTimeout((function(_this) {
-      return function() {
-        _this.updateBoardView();
-      };
-    })(this), 200);
-    setTimeout((function(_this) {
-      return function() {
-        _this.showOneNumber();
-      };
-    })(this), 250);
-  };
-
-  App.prototype.moveRight = function() {
-    var moveCell, moveCells, _i, _len;
-    if ((moveCells = this.board.moveRight())) {
-      for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
-        moveCell = moveCells[_i];
-        setTimeout((function(_this) {
-          return function() {
-            return _this.showMoveNumber(moveCell);
-          };
-        })(this), 25);
-      }
+    if (canMove) {
       setTimeout((function(_this) {
         return function() {
-          return _this.updateBoardView();
+          _this.updateBoardView();
         };
-      })(this), 200);
+      })(this), 500);
       setTimeout((function(_this) {
         return function() {
-          return _this.showOneNumber();
+          _this.showOneNumber();
         };
-      })(this), 250);
-    }
-  };
-
-  App.prototype.moveRight = function() {
-    this.board.moveRight((function(_this) {
-      return function() {
-        _this.showMoveNumber(arguments);
-      };
-    })(this));
-    setTimeout((function(_this) {
-      return function() {
-        return _this.updateBoardView();
-      };
-    })(this), 200);
-    setTimeout((function(_this) {
-      return function() {
-        return _this.showOneNumber();
-      };
-    })(this), 250);
-  };
-
-  App.prototype.moveUp = function() {
-    var moveCell, moveCells, _i, _len;
-    if ((moveCells = this.board.moveUp())) {
-      for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
-        moveCell = moveCells[_i];
-        setTimeout((function(_this) {
-          return function() {
-            return _this.showMoveNumber(moveCell);
-          };
-        })(this), 25);
-      }
-      setTimeout((function(_this) {
-        return function() {
-          return _this.updateBoardView();
-        };
-      })(this), 200);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.showOneNumber();
-        };
-      })(this), 250);
-    }
-  };
-
-  App.prototype.moveDown = function() {
-    var moveCell, moveCells, _i, _len;
-    if ((moveCells = this.board.moveDown())) {
-      for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
-        moveCell = moveCells[_i];
-        setTimeout((function(_this) {
-          return function() {
-            return _this.showMoveNumber(moveCell);
-          };
-        })(this), 25);
-      }
-      setTimeout((function(_this) {
-        return function() {
-          return _this.updateBoardView();
-        };
-      })(this), 200);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.showOneNumber();
-        };
-      })(this), 250);
+      })(this), 750);
     }
   };
 
@@ -273,25 +162,25 @@ $(function() {
     e.preventDefault();
     switch (e.which) {
       case 37:
-        appGame.moveLeft();
+        appGame.moveCell('moveLeft');
         setTimeout(function() {
           appGame.isGameOver();
         }, 300);
         break;
       case 38:
-        appGame.moveUp();
+        appGame.moveCell('moveUp');
         setTimeout(function() {
           appGame.isGameOver();
         }, 300);
         break;
       case 39:
-        appGame.moveRight();
+        appGame.moveCell('moveRight');
         setTimeout(function() {
           appGame.isGameOver();
         }, 300);
         break;
       case 40:
-        appGame.moveDown();
+        appGame.moveCell('moveDown');
         setTimeout(function() {
           appGame.isGameOver();
         }, 300);

@@ -31,7 +31,6 @@ Board = (function() {
       randX = +Math.floor(Math.random() * 4);
       randY = +Math.floor(Math.random() * 4);
     }
-    console.log(times + 'times');
     randNumberCell.value = Math.random() < 0.5 ? 2 : 4;
     return randNumberCell;
   };
