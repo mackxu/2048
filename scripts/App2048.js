@@ -91,7 +91,11 @@ App = (function() {
     if ((moveCells = this.board.moveLeft())) {
       for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
         moveCell = moveCells[_i];
-        this.showMoveNumber(moveCell);
+        setTimeout((function(_this) {
+          return function() {
+            return _this.showMoveNumber(moveCell);
+          };
+        })(this), 25);
       }
       setTimeout((function(_this) {
         return function() {
@@ -103,12 +107,25 @@ App = (function() {
           return _this.showOneNumber();
         };
       })(this), 250);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.isGameOver();
-        };
-      })(this), 300);
     }
+  };
+
+  App.prototype.moveLeft = function() {
+    this.board.moveLeft((function(_this) {
+      return function() {
+        _this.showMoveNumber(arguments);
+      };
+    })(this));
+    setTimeout((function(_this) {
+      return function() {
+        _this.updateBoardView();
+      };
+    })(this), 200);
+    setTimeout((function(_this) {
+      return function() {
+        _this.showOneNumber();
+      };
+    })(this), 250);
   };
 
   App.prototype.moveRight = function() {
@@ -116,7 +133,11 @@ App = (function() {
     if ((moveCells = this.board.moveRight())) {
       for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
         moveCell = moveCells[_i];
-        this.showMoveNumber(moveCell);
+        setTimeout((function(_this) {
+          return function() {
+            return _this.showMoveNumber(moveCell);
+          };
+        })(this), 25);
       }
       setTimeout((function(_this) {
         return function() {
@@ -128,12 +149,25 @@ App = (function() {
           return _this.showOneNumber();
         };
       })(this), 250);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.isGameOver();
-        };
-      })(this), 300);
     }
+  };
+
+  App.prototype.moveRight = function() {
+    this.board.moveRight((function(_this) {
+      return function() {
+        _this.showMoveNumber(arguments);
+      };
+    })(this));
+    setTimeout((function(_this) {
+      return function() {
+        return _this.updateBoardView();
+      };
+    })(this), 200);
+    setTimeout((function(_this) {
+      return function() {
+        return _this.showOneNumber();
+      };
+    })(this), 250);
   };
 
   App.prototype.moveUp = function() {
@@ -141,7 +175,11 @@ App = (function() {
     if ((moveCells = this.board.moveUp())) {
       for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
         moveCell = moveCells[_i];
-        this.showMoveNumber(moveCell);
+        setTimeout((function(_this) {
+          return function() {
+            return _this.showMoveNumber(moveCell);
+          };
+        })(this), 25);
       }
       setTimeout((function(_this) {
         return function() {
@@ -153,11 +191,6 @@ App = (function() {
           return _this.showOneNumber();
         };
       })(this), 250);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.isGameOver();
-        };
-      })(this), 300);
     }
   };
 
@@ -166,7 +199,11 @@ App = (function() {
     if ((moveCells = this.board.moveDown())) {
       for (_i = 0, _len = moveCells.length; _i < _len; _i++) {
         moveCell = moveCells[_i];
-        this.showMoveNumber(moveCell);
+        setTimeout((function(_this) {
+          return function() {
+            return _this.showMoveNumber(moveCell);
+          };
+        })(this), 25);
       }
       setTimeout((function(_this) {
         return function() {
@@ -178,11 +215,6 @@ App = (function() {
           return _this.showOneNumber();
         };
       })(this), 250);
-      setTimeout((function(_this) {
-        return function() {
-          return _this.isGameOver();
-        };
-      })(this), 300);
     }
   };
 
@@ -207,8 +239,8 @@ App = (function() {
 
   App.prototype.showMoveNumber = function(moveCells) {
     var end, start;
-    start = moveCells.startCell;
-    end = moveCells.endCell;
+    start = moveCells[0];
+    end = moveCells[1];
     $("#number-cell-" + start.x + "-" + start.y).animate({
       top: this.getPosTop(end.x, end.y),
       left: this.getPosLeft(end.x, end.y)
@@ -241,13 +273,29 @@ $(function() {
     e.preventDefault();
     switch (e.which) {
       case 37:
-        return appGame.moveLeft();
+        appGame.moveLeft();
+        setTimeout(function() {
+          appGame.isGameOver();
+        }, 300);
+        break;
       case 38:
-        return appGame.moveUp();
+        appGame.moveUp();
+        setTimeout(function() {
+          appGame.isGameOver();
+        }, 300);
+        break;
       case 39:
-        return appGame.moveRight();
+        appGame.moveRight();
+        setTimeout(function() {
+          appGame.isGameOver();
+        }, 300);
+        break;
       case 40:
-        return appGame.moveDown();
+        appGame.moveDown();
+        setTimeout(function() {
+          appGame.isGameOver();
+        }, 300);
+        break;
       default:
         return false;
     }

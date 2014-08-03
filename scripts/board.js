@@ -122,7 +122,7 @@ Board = (function() {
 
   Board.prototype.noMove = function() {};
 
-  Board.prototype.moveLeft = function() {
+  Board.prototype.moveLeft = function(callback) {
     var i, isSameCell, j, k, merged, moveCells, startCell, targetCell, _i, _j, _k;
     moveCells = [];
     if (!this.canMoveLeft()) {
@@ -163,6 +163,41 @@ Board = (function() {
     } else {
       return false;
     }
+  };
+
+  Board.prototype.moveLeft = function(callback) {
+    var i, isSameCell, j, k, merged, startCell, targetCell, _i, _j, _k;
+    if (!this.canMoveLeft()) {
+      return false;
+    }
+    for (i = _i = 0; _i < 4; i = ++_i) {
+      merged = false;
+      for (j = _j = 1; _j < 4; j = ++_j) {
+        startCell = this.numberCells[i][j];
+        if (startCell.value !== 0) {
+          for (k = _k = 0; 0 <= j ? _k < j : _k > j; k = 0 <= j ? ++_k : --_k) {
+            targetCell = this.numberCells[i][k];
+            isSameCell = targetCell.value === startCell.value;
+            if (targetCell.value === 0 || isSameCell) {
+              if (this.noBlock(startCell, targetCell)) {
+                if (isSameCell) {
+                  if (merged) {
+                    continue;
+                  }
+                  this.score += startCell.value;
+                  merged = true;
+                }
+                targetCell.value += startCell.value;
+                startCell.value = 0;
+                callback(startCell, targetCell);
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
   };
 
   Board.prototype.moveRight = function() {
@@ -208,6 +243,43 @@ Board = (function() {
     } else {
       return false;
     }
+  };
+
+  Board.prototype.moveRight = function(callback) {
+    var isSameCell, j, k, merged, rowCells, startCell, targetCell, _i, _j, _k, _len, _ref;
+    if (!this.canMoveRight()) {
+      return false;
+    }
+    _ref = this.numberCells;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      rowCells = _ref[_i];
+      merged = false;
+      for (j = _j = 3; _j > 0; j = --_j) {
+        startCell = rowCells[j - 1];
+        if (startCell.value !== 0) {
+          for (k = _k = 3; 3 <= j ? _k < j : _k > j; k = 3 <= j ? ++_k : --_k) {
+            targetCell = rowCells[k];
+            isSameCell = targetCell.value === startCell.value;
+            if (targetCell.value === 0 || isSameCell) {
+              if (this.noBlock(targetCell, startCell)) {
+                if (isSameCell) {
+                  if (merged) {
+                    continue;
+                  }
+                  this.score += startCell.value;
+                  merged = true;
+                }
+                targetCell.value += startCell.value;
+                startCell.value = 0;
+                callback(startCell, targetCell);
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
   };
 
   Board.prototype.moveUp = function() {

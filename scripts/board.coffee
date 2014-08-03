@@ -85,7 +85,7 @@ class Board
 	noMove: () ->
 		# 不能移动，游戏结束
 
-	moveLeft: () ->
+	moveLeft: (callback) ->
 		moveCells = []
 		return false unless @canMoveLeft()
 
@@ -114,6 +114,33 @@ class Board
 								
 								break							# 然后寻找本滑道下一个数字块														
 		if moveCells.length isnt 0 then moveCells else false
+	moveLeft: (callback) ->
+		
+		return false unless @canMoveLeft()
+
+		for i in [0...4]			
+			merged = false					# 保证每个航道最多有一个数字相加
+			for j in [1...4]
+				startCell = @numberCells[i][j]			
+				# console.log i, j
+				if startCell.value != 0					
+					for k in [0...j]					
+						targetCell = @numberCells[i][k]
+						isSameCell = targetCell.value is startCell.value
+						if targetCell.value is 0 or isSameCell
+							if @noBlock startCell, targetCell		
+								# 此时可以移动
+								if isSameCell					# 两个数字块的值相等			
+									continue if merged			# 如果已经有合并, 进入下次循环
+									@score += startCell.value	# 数字合并, 奖励分数
+									merged = true				# 标记本航道已经有数字相加了
+								targetCell.value += startCell.value
+								startCell.value = 0
+								# console.log startCell, targetCell
+								callback startCell, targetCell
+								
+								break							# 然后寻找本滑道下一个数字块														
+		return true
 	moveRight: () ->
 		moveCells = []
 		return false unless @canMoveRight()
@@ -143,6 +170,31 @@ class Board
 								break
 
 		if moveCells.length isnt 0 then moveCells else false
+	
+	moveRight: (callback) ->
+		return false unless @canMoveRight()
+
+		# 找到移动目标
+		for rowCells in @numberCells
+			merged = false
+			for j in [3...0]
+				startCell = rowCells[j-1]
+				if startCell.value isnt 0			# 待滑动数字块
+					for k in [3...j]
+						targetCell = rowCells[k]
+						isSameCell = targetCell.value is startCell.value
+						if targetCell.value is 0 or isSameCell
+							# 判断两者能否连通
+							if @noBlock targetCell, startCell
+								if isSameCell
+									continue if merged
+									@score += startCell.value	# 数字合并, 奖励分数
+									merged = true				# 标记本航道已经有数字相加了
+								targetCell.value += startCell.value
+								startCell.value = 0
+								callback startCell, targetCell
+								break
+		return true
 	moveUp: () ->
 		moveCells = []
 		return false unless @canMoveLeft()

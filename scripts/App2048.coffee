@@ -101,7 +101,10 @@ class App
 	moveLeft: () -> 
 		if(moveCells = @board.moveLeft())
 			# 执行有滑动任务的数字块
-			@showMoveNumber moveCell for moveCell in moveCells
+			for moveCell in moveCells
+				setTimeout(=>
+					@showMoveNumber moveCell 
+				, 25)
 			# 显示一个新的数字块
 			# @showOneNumber()
 			
@@ -113,16 +116,31 @@ class App
 			setTimeout( => 
 				@showOneNumber()
 			, 250)
-
-			setTimeout( => 
-				@isGameOver()
-			, 300)
 		return
-	
+	moveLeft: () ->
+		@board.moveLeft( => 
+			@showMoveNumber(arguments)
+			return
+		)
+		# 刷新棋盘格
+		setTimeout( =>
+			@updateBoardView()
+			return 
+		, 200)
+
+		setTimeout( => 
+			@showOneNumber()
+			return
+		, 250)
+		return
+			
 	moveRight: () ->
 		if(moveCells = @board.moveRight())
 			# 执行有滑动任务的数字块
-			@showMoveNumber moveCell for moveCell in moveCells
+			for moveCell in moveCells
+				setTimeout(=>
+					@showMoveNumber moveCell 
+				, 25)
 			# 显示一个新的数字块
 			# @showOneNumber()
 			
@@ -134,16 +152,28 @@ class App
 			setTimeout( => 
 				@showOneNumber()
 			, 250)
-
-			setTimeout( => 
-				@isGameOver()
-			, 300)
 		return 
-	
+	moveRight: () ->
+		@board.moveRight( => 
+			@showMoveNumber(arguments)
+			return
+		)
+		# 刷新棋盘格
+		setTimeout( =>
+			@updateBoardView()
+		, 200)
+
+		setTimeout( => 
+			@showOneNumber()
+		, 250)
+		return
 	moveUp: () ->
 		if(moveCells = @board.moveUp())
 			# 执行有滑动任务的数字块
-			@showMoveNumber moveCell for moveCell in moveCells
+			for moveCell in moveCells
+				setTimeout(=>
+					@showMoveNumber moveCell 
+				, 25)
 			# 显示一个新的数字块
 			# @showOneNumber()
 			
@@ -155,15 +185,14 @@ class App
 			setTimeout( => 
 				@showOneNumber()
 			, 250)
-
-			setTimeout( => 
-				@isGameOver()
-			, 300)
 		return 
 	moveDown: () ->
 		if(moveCells = @board.moveDown())
 			# 执行有滑动任务的数字块
-			@showMoveNumber moveCell for moveCell in moveCells
+			for moveCell in moveCells
+				setTimeout(=>
+					@showMoveNumber moveCell 
+				, 25)
 			# 显示一个新的数字块
 			# @showOneNumber()
 			
@@ -175,10 +204,6 @@ class App
 			setTimeout( => 
 				@showOneNumber()
 			, 250)
-
-			setTimeout( => 
-				@isGameOver()
-			, 300)
 		return 
 	showOneNumber: () ->
 		# console.log RandNumberCell = @board.generateOneNumber()
@@ -202,8 +227,8 @@ class App
 				}, 50) 
 		return
 	showMoveNumber: (moveCells) ->
-		start = moveCells.startCell
-		end = moveCells.endCell
+		start = moveCells[0]
+		end = moveCells[1]
 		# console.log start, end
 		$("#number-cell-#{start.x}-#{start.y}")
 			.animate({
@@ -232,12 +257,32 @@ $ ->
 		switch e.which
 			when 37
 				appGame.moveLeft()
+				setTimeout( -> 
+					appGame.isGameOver()
+					return
+				, 300)
+				return
 			when 38
 				appGame.moveUp()
+				setTimeout( -> 
+					appGame.isGameOver()
+					return
+				, 300)
+				return
 			when 39
 				appGame.moveRight()
+				setTimeout( -> 
+					appGame.isGameOver()
+					return
+				, 300)
+				return
 			when 40
 				appGame.moveDown()
+				setTimeout( -> 
+					appGame.isGameOver()
+					return
+				, 300)
+				return
 			else 
 				false	
 	)
