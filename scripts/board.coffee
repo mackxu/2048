@@ -31,11 +31,7 @@ class Board
 		console.log times + 'times'
 		# 在随机位置上显示随机数字
 		randNumberCell.value = if Math.random() < 0.5 then 2 else 4
-		return {
-			numberCell: randNumberCell
-			randX: randX
-			randY: randY
-		}
+		return randNumberCell
 	noSpace: () ->
 		# 判断是否有空位显示新数字
 		for i in [0...4]
@@ -63,7 +59,7 @@ class Board
 	canMoveUp: () ->
 		for j in [0...4]
 			for i in [1...4]			
-				prevCell = @numberCells[i][j-1]
+				prevCell = @numberCells[i-1][j]
 				curCell = @numberCells[i][j]
 				if prevCell is 0 or prevCell.value is curCell.value
 					return true
@@ -72,25 +68,19 @@ class Board
 		for j in [0...4]
 			for i in [3...0]			
 				prevCell = @numberCells[i][j]
-				curCell = @numberCells[i][j-1]
+				curCell = @numberCells[i-1][j]
 				if prevCell is 0 or prevCell.value is curCell.value
 					return true
 		return false
-	noBlock: (numberFrom, numberTo) ->
-		# 当执行滑动时, 判断两个数字块是否通路
-		# if numberFrom.x is numberTo.x
-		# 	from = numberFrom.y
-		# 	to = numberTo.y
-		# 	for i in [from + 1...to]
-		# 		if @numberCells[numberFrom.x][i] isnt 0
-		# 			return false
-		# else 
-		# 	from = numberFrom.x
-		# 	to = numberTo.x
-		# 	for i in [from + 1...to]
-		# 		if @numberCells[i][numberFrom.y] isnt 0
-		# 			return false
-
+	noBlock: (start, end) ->
+		if start.x is end.x
+			# 水平方向上的通路
+			for y in [start.y...end.y]
+				return @numberCells[start.x][y] isnt 0
+		else 
+			# 判断垂直方向是否通路
+			for x in [start.x...end.x]
+				return @numberCells[x][start.y] isnt 0
 		return true
 	noMove: () ->
 		# 不能移动，游戏结束

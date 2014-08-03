@@ -33,11 +33,7 @@ Board = (function() {
     }
     console.log(times + 'times');
     randNumberCell.value = Math.random() < 0.5 ? 2 : 4;
-    return {
-      numberCell: randNumberCell,
-      randX: randX,
-      randY: randY
-    };
+    return randNumberCell;
   };
 
   Board.prototype.noSpace = function() {
@@ -86,7 +82,7 @@ Board = (function() {
     var curCell, i, j, prevCell, _i, _j;
     for (j = _i = 0; _i < 4; j = ++_i) {
       for (i = _j = 1; _j < 4; i = ++_j) {
-        prevCell = this.numberCells[i][j - 1];
+        prevCell = this.numberCells[i - 1][j];
         curCell = this.numberCells[i][j];
         if (prevCell === 0 || prevCell.value === curCell.value) {
           return true;
@@ -101,7 +97,7 @@ Board = (function() {
     for (j = _i = 0; _i < 4; j = ++_i) {
       for (i = _j = 3; _j > 0; i = --_j) {
         prevCell = this.numberCells[i][j];
-        curCell = this.numberCells[i][j - 1];
+        curCell = this.numberCells[i - 1][j];
         if (prevCell === 0 || prevCell.value === curCell.value) {
           return true;
         }
@@ -110,7 +106,17 @@ Board = (function() {
     return false;
   };
 
-  Board.prototype.noBlock = function(numberFrom, numberTo) {
+  Board.prototype.noBlock = function(start, end) {
+    var x, y, _i, _j, _ref, _ref1, _ref2, _ref3;
+    if (start.x === end.x) {
+      for (y = _i = _ref = start.y, _ref1 = end.y; _ref <= _ref1 ? _i < _ref1 : _i > _ref1; y = _ref <= _ref1 ? ++_i : --_i) {
+        return this.numberCells[start.x][y] !== 0;
+      }
+    } else {
+      for (x = _j = _ref2 = start.x, _ref3 = end.x; _ref2 <= _ref3 ? _j < _ref3 : _j > _ref3; x = _ref2 <= _ref3 ? ++_j : --_j) {
+        return this.numberCells[x][start.y] !== 0;
+      }
+    }
     return true;
   };
 

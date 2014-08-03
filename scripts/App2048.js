@@ -39,28 +39,32 @@ App = (function() {
   };
 
   App.prototype.updateBoardView = function() {
-    var cellSideLength, i, j, numberCell, posX, posY, _i, _j;
-    $('.number-cell').remove();
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 0; _j < 4; j = ++_j) {
-        numberCell = this.numberCells[i][j];
-        cellSideLength = this.cellSideLength;
-        posX = this.getPosLeft(i, j);
-        posY = this.getPosTop(i, j);
-        if (numberCell.value === 0) {
-          posX += this.cellSideLength / 2;
-          posY += this.cellSideLength / 2;
-          cellSideLength = 0;
+    var cell, cellNode, i, j, number, rowCells, _i, _j, _len, _len1, _ref;
+    _ref = this.numberCells;
+    for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+      rowCells = _ref[i];
+      for (j = _j = 0, _len1 = rowCells.length; _j < _len1; j = ++_j) {
+        cell = rowCells[j];
+        cellNode = $("#number-cell-" + i + "-" + j).css('display', 'none');
+        number = cell.value;
+        if (number === 0) {
+          cellNode.css({
+            width: 0,
+            height: 0,
+            top: this.getPosTop(i, j) + this.cellSideLength / 2,
+            left: this.getPosLeft(i, j) + this.cellSideLength / 2
+          }).text('');
+        } else {
+          cellNode.css({
+            width: this.cellSideLength,
+            height: this.cellSideLength,
+            top: this.getPosTop(i, j),
+            left: this.getPosLeft(i, j),
+            color: cell.getColor(),
+            backgroundColor: cell.getBgColor()
+          }).text(number);
         }
-        $("<div class=\"number-cell\" id=\"number-cell-" + i + "-" + j + "\"></div>").text(numberCell.value || '').css({
-          width: cellSideLength,
-          height: cellSideLength,
-          borderRadius: this.borderRadius,
-          top: posY,
-          left: posX,
-          color: numberCell.getColor(),
-          backgroundColor: numberCell.getBgColor()
-        }).appendTo(this.$gridContainer);
+        cellNode.css('display', 'block');
       }
     }
   };
@@ -183,16 +187,15 @@ App = (function() {
   };
 
   App.prototype.showOneNumber = function() {
-    var RandNumberCell, bgColor, color, i, j, numberCell;
-    if ((RandNumberCell = this.board.generateOneNumber())) {
-      i = RandNumberCell.randX;
-      j = RandNumberCell.randY;
-      numberCell = RandNumberCell.numberCell;
+    var bgColor, color, i, j, numberCell;
+    if ((numberCell = this.board.generateOneNumber())) {
+      i = numberCell.x;
+      j = numberCell.y;
       bgColor = numberCell.getBgColor();
       color = numberCell.getColor();
       $("#number-cell-" + i + "-" + j).css({
-        color: color,
-        backgroundColor: bgColor
+        color: numberCell.getColor(),
+        backgroundColor: numberCell.getBgColor()
       }).text(numberCell.value).animate({
         width: this.cellSideLength,
         height: this.cellSideLength,
@@ -206,7 +209,10 @@ App = (function() {
     var end, start;
     start = moveCells.startCell;
     end = moveCells.endCell;
-    $("#number-cell-" + start.x + "-" + start.y).css({
+    $("#number-cell-" + start.x + "-" + start.y).animate({
+      top: this.getPosTop(end.x, end.y),
+      left: this.getPosLeft(end.x, end.y)
+    }, 200).css({
       top: this.getPosTop(end.x, end.y),
       left: this.getPosLeft(end.x, end.y)
     });
@@ -240,7 +246,7 @@ $(function() {
         return appGame.moveUp();
       case 39:
         return appGame.moveRight();
-      case 39:
+      case 40:
         return appGame.moveDown();
       default:
         return false;

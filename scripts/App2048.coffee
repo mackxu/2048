@@ -30,32 +30,58 @@ class App
 			@showOneNumber()
 		, 25)
 		return
-	updateBoardView: () ->
-		$('.number-cell').remove()
-		for i in [0...4]
-			for j in [0...4]
-				numberCell = @numberCells[i][j]
-				cellSideLength = @cellSideLength
-				posX = @getPosLeft(i, j)
-				posY = @getPosTop(i, j)
-				if numberCell.value is 0
-					posX += @cellSideLength / 2
-					posY += @cellSideLength / 2
-					cellSideLength = 0 
+	# updateBoardView: () ->
+	# 	$('.number-cell').remove()
+	# 	$numberCollections = $(document.createDocumentFragment())
+	# 	for i in [0...4]
+	# 		for j in [0...4]
+	# 			numberCell = @numberCells[i][j]
+	# 			# 局部变量保持，避免@cellSideLength的值被修改
+	# 			cellSideLength = @cellSideLength
+	# 			posX = @getPosLeft(i, j)
+	# 			posY = @getPosTop(i, j)
+	# 			if numberCell.value is 0
+	# 				posX += @cellSideLength / 2
+	# 				posY += @cellSideLength / 2
+	# 				cellSideLength = 0 
 
-				$("<div class=\"number-cell\" id=\"number-cell-#{i}-#{j}\"></div>")
-					.text(numberCell.value or '')
-					.css({
-						width: cellSideLength
-						height: cellSideLength
-						borderRadius: @borderRadius
-						top: posY
-						left: posX
-						color: numberCell.getColor()
-						backgroundColor: numberCell.getBgColor()
-					}).appendTo(@$gridContainer)
+	# 			$("<div class=\"number-cell\" id=\"number-cell-#{i}-#{j}\"></div>")
+	# 				.text(numberCell.value or '')
+	# 				.css({
+	# 					width: cellSideLength
+	# 					height: cellSideLength
+	# 					borderRadius: @borderRadius
+	# 					top: posY
+	# 					left: posX
+	# 					color: numberCell.getColor()
+	# 					backgroundColor: numberCell.getBgColor()
+	# 				}).appendTo($numberCollections)
+	# 	@$gridContainer.hide().append($numberCollections).show()
+	# 	return
+	updateBoardView: () ->
+		# 动画后, 根据最新数值重绘所有数字块
+		for rowCells, i in @numberCells
+			for cell, j in rowCells
+				cellNode = $("#number-cell-#{i}-#{j}").css('display', 'none')
+				number = cell.value
+				if number is 0
+					cellNode.css({
+						width: 0
+						height: 0
+						top: @getPosTop(i, j) + @cellSideLength / 2
+						left: @getPosLeft(i, j) + @cellSideLength / 2
+					}).text('')
+				else 
+					cellNode.css({
+						width: @cellSideLength
+						height: @cellSideLength
+						top: @getPosTop(i, j)
+						left: @getPosLeft(i, j)
+						color: cell.getColor()
+						backgroundColor: cell.getBgColor() 
+					}).text(number)
+				cellNode.css('display', 'block')
 		return
-	
 	createResponeBoard: () ->
 		documentWidth = window.screen.availWidth
 		if documentWidth > 499 
@@ -156,17 +182,16 @@ class App
 		return 
 	showOneNumber: () ->
 		# console.log RandNumberCell = @board.generateOneNumber()
-		if(RandNumberCell = @board.generateOneNumber())
-			i = RandNumberCell.randX
-			j = RandNumberCell.randY
-			numberCell = RandNumberCell.numberCell
+		if(numberCell = @board.generateOneNumber())
+			i = numberCell.x
+			j = numberCell.y
 			bgColor = numberCell.getBgColor()
 			color = numberCell.getColor()
 			# console.log bgColor, color
 			$("#number-cell-#{i}-#{j}")
 				.css({
-					color: color
-					backgroundColor: bgColor
+					color: numberCell.getColor()
+					backgroundColor: numberCell.getBgColor()
 				})
 				.text(numberCell.value)
 				.animate({
@@ -181,10 +206,10 @@ class App
 		end = moveCells.endCell
 		# console.log start, end
 		$("#number-cell-#{start.x}-#{start.y}")
-			# .animate({
-			# 	top: @getPosTop(end.x, end.y)
-			# 	left: @getPosLeft(end.x, end.y)
-			# 	}, 200)
+			.animate({
+				top: @getPosTop(end.x, end.y)
+				left: @getPosLeft(end.x, end.y)
+				}, 200)
 			.css({
 				top: @getPosTop(end.x, end.y)
 				left: @getPosLeft(end.x, end.y)
@@ -211,7 +236,7 @@ $ ->
 				appGame.moveUp()
 			when 39
 				appGame.moveRight()
-			when 39
+			when 40
 				appGame.moveDown()
 			else 
 				false	
