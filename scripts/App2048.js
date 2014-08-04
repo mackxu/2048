@@ -39,34 +39,33 @@ App = (function() {
   };
 
   App.prototype.updateBoardView = function() {
-    var cell, cellNode, i, j, number, rowCells, _i, _j, _len, _len1, _ref;
-    _ref = this.numberCells;
-    for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-      rowCells = _ref[i];
-      for (j = _j = 0, _len1 = rowCells.length; _j < _len1; j = ++_j) {
-        cell = rowCells[j];
-        cellNode = $("#number-cell-" + i + "-" + j).css('display', 'none');
-        number = cell.value;
+    this.board.updateNumbercells((function(_this) {
+      return function(numberCell) {
+        var cellNode, number, x, y;
+        x = numberCell.x, y = numberCell.y;
+        cellNode = $("#number-cell-" + x + "-" + y).css('display', 'none');
+        number = numberCell.value;
         if (number === 0) {
           cellNode.css({
             width: 0,
             height: 0,
-            top: this.getPosTop(i, j) + this.cellSideLength / 2,
-            left: this.getPosLeft(i, j) + this.cellSideLength / 2
+            top: _this.getPosTop(x, y) + _this.cellSideLength / 2,
+            left: _this.getPosLeft(x, y) + _this.cellSideLength / 2
           }).text('');
         } else {
           cellNode.css({
-            width: this.cellSideLength,
-            height: this.cellSideLength,
-            top: this.getPosTop(i, j),
-            left: this.getPosLeft(i, j),
-            color: cell.getColor(),
-            backgroundColor: cell.getBgColor()
+            width: _this.cellSideLength,
+            height: _this.cellSideLength,
+            lineHeight: _this.cellSideLength + 'px',
+            top: _this.getPosTop(x, y),
+            left: _this.getPosLeft(x, y),
+            color: numberCell.getColor(),
+            backgroundColor: numberCell.getBgColor()
           }).text(number);
         }
         cellNode.css('display', 'block');
-      }
-    }
+      };
+    })(this));
   };
 
   App.prototype.createResponeBoard = function() {
@@ -108,12 +107,10 @@ App = (function() {
   };
 
   App.prototype.showOneNumber = function() {
-    var bgColor, color, i, j, numberCell;
+    var i, j, numberCell;
     if ((numberCell = this.board.generateOneNumber())) {
       i = numberCell.x;
       j = numberCell.y;
-      bgColor = numberCell.getBgColor();
-      color = numberCell.getColor();
       $("#number-cell-" + i + "-" + j).css({
         color: numberCell.getColor(),
         backgroundColor: numberCell.getBgColor()

@@ -1,5 +1,4 @@
 class App
-
 	constructor: (@$gridContainer) ->
 		@cellSideLength = 100
 		@cellSpace = 20
@@ -30,57 +29,57 @@ class App
 			@showOneNumber()
 		, 25)
 		return
+	
 	# updateBoardView: () ->
-	# 	$('.number-cell').remove()
-	# 	$numberCollections = $(document.createDocumentFragment())
-	# 	for i in [0...4]
-	# 		for j in [0...4]
-	# 			numberCell = @numberCells[i][j]
-	# 			# 局部变量保持，避免@cellSideLength的值被修改
-	# 			cellSideLength = @cellSideLength
-	# 			posX = @getPosLeft(i, j)
-	# 			posY = @getPosTop(i, j)
-	# 			if numberCell.value is 0
-	# 				posX += @cellSideLength / 2
-	# 				posY += @cellSideLength / 2
-	# 				cellSideLength = 0 
-
-	# 			$("<div class=\"number-cell\" id=\"number-cell-#{i}-#{j}\"></div>")
-	# 				.text(numberCell.value or '')
-	# 				.css({
-	# 					width: cellSideLength
-	# 					height: cellSideLength
-	# 					borderRadius: @borderRadius
-	# 					top: posY
-	# 					left: posX
-	# 					color: numberCell.getColor()
-	# 					backgroundColor: numberCell.getBgColor()
-	# 				}).appendTo($numberCollections)
-	# 	@$gridContainer.hide().append($numberCollections).show()
+	# 	# 动画后, 根据最新数值重绘所有数字块
+	# 	for rowCells, i in @numberCells
+	# 		for cell, j in rowCells
+	# 			cellNode = $("#number-cell-#{i}-#{j}").css('display', 'none')
+	# 			number = cell.value
+	# 			if number is 0
+	# 				cellNode.css({
+	# 					width: 0
+	# 					height: 0
+	# 					top: @getPosTop(i, j) + @cellSideLength / 2
+	# 					left: @getPosLeft(i, j) + @cellSideLength / 2
+	# 				}).text('')
+	# 			else 
+	# 				cellNode.css({
+	# 					width: @cellSideLength
+	# 					height: @cellSideLength
+	# 					lineHeight: @cellSideLength + 'px'
+	# 					top: @getPosTop(i, j)
+	# 					left: @getPosLeft(i, j)
+	# 					color: cell.getColor()
+	# 					backgroundColor: cell.getBgColor() 
+	# 				}).text(number)
+	# 			cellNode.css('display', 'block')
 	# 	return
 	updateBoardView: () ->
-		# 动画后, 根据最新数值重绘所有数字块
-		for rowCells, i in @numberCells
-			for cell, j in rowCells
-				cellNode = $("#number-cell-#{i}-#{j}").css('display', 'none')
-				number = cell.value
-				if number is 0
-					cellNode.css({
-						width: 0
-						height: 0
-						top: @getPosTop(i, j) + @cellSideLength / 2
-						left: @getPosLeft(i, j) + @cellSideLength / 2
-					}).text('')
-				else 
-					cellNode.css({
-						width: @cellSideLength
-						height: @cellSideLength
-						top: @getPosTop(i, j)
-						left: @getPosLeft(i, j)
-						color: cell.getColor()
-						backgroundColor: cell.getBgColor() 
-					}).text(number)
-				cellNode.css('display', 'block')
+		@board.updateNumbercells( (numberCell) => 
+			{ x, y } = numberCell
+			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
+			number = numberCell.value
+			if number is 0
+				cellNode.css({
+					width: 0
+					height: 0
+					top: @getPosTop(x, y) + @cellSideLength / 2
+					left: @getPosLeft(x, y) + @cellSideLength / 2
+				}).text('')
+			else 
+				cellNode.css({
+					width: @cellSideLength
+					height: @cellSideLength
+					lineHeight: @cellSideLength + 'px'
+					top: @getPosTop(x, y)
+					left: @getPosLeft(x, y)
+					color: numberCell.getColor()
+					backgroundColor: numberCell.getBgColor() 
+				}).text(number)
+			cellNode.css('display', 'block')
+			return
+		)
 		return
 	createResponeBoard: () ->
 		documentWidth = window.screen.availWidth
@@ -123,9 +122,7 @@ class App
 		if(numberCell = @board.generateOneNumber())
 			i = numberCell.x
 			j = numberCell.y
-			bgColor = numberCell.getBgColor()
-			color = numberCell.getColor()
-			# console.log bgColor, color
+
 			$("#number-cell-#{i}-#{j}")
 				.css({
 					color: numberCell.getColor()

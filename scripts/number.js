@@ -6,6 +6,7 @@ Number = (function() {
     this.value = value;
     this.x = x;
     this.y = y;
+    this.merged = false;
   }
 
   Number.prototype.getColor = function() {

@@ -1,9 +1,10 @@
 class Number
 	constructor: (@value, @x, @y) ->
-		 # @color = @getColor()
-		 # @bgColor = @getBgColor()
+		 @merged = false
+	
 	getColor: () ->
 		if @value <= 4 then '#776e65' else '#fff';
+	
 	getBgColor: () ->
 		switch @value
 			when 0 then 'transparent'
@@ -21,7 +22,3 @@ class Number
 			when 4096 then '#a6c'
 			when 8192 then '#93c'
 			else '#000'
-
-			
-
-
