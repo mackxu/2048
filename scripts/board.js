@@ -119,14 +119,30 @@ Board = (function() {
   };
 
   Board.prototype.noBlock = function(start, end) {
-    var x, y, _i, _j, _ref, _ref1, _ref2, _ref3;
+    var x, x1, x2, y, y1, y2, _i, _j;
     if (start.x === end.x) {
-      for (y = _i = _ref = start.y, _ref1 = end.y; _ref <= _ref1 ? _i < _ref1 : _i > _ref1; y = _ref <= _ref1 ? ++_i : --_i) {
-        return this.numberCells[start.x][y] !== 0;
+      x = start.x;
+      if (start.y < end.y) {
+        y1 = start.y + 1;
+        y2 = end.y;
+      } else {
+        y1 = end.y + 1;
+        y2 = start.y;
+      }
+      for (y = _i = y1; y1 <= y2 ? _i < y2 : _i > y2; y = y1 <= y2 ? ++_i : --_i) {
+        return this.numberCells[x][y] !== 0;
       }
     } else {
-      for (x = _j = _ref2 = start.x, _ref3 = end.x; _ref2 <= _ref3 ? _j < _ref3 : _j > _ref3; x = _ref2 <= _ref3 ? ++_j : --_j) {
-        return this.numberCells[x][start.y] !== 0;
+      y = start.y;
+      if (start.x < end.x) {
+        x1 = start.x + 1;
+        x2 = end.x;
+      } else {
+        x1 = end.x + 1;
+        x2 = start.x;
+      }
+      for (x = _j = x1; x1 <= x2 ? _j < x2 : _j > x2; x = x1 <= x2 ? ++_j : --_j) {
+        return this.numberCells[x][y] !== 0;
       }
     }
     return true;
@@ -134,13 +150,12 @@ Board = (function() {
 
   Board.prototype.noMove = function() {};
 
-  Board.prototype.moveCell = function(startCell, targetCell, moveCellAnimate) {
-    var isSameCell;
-    isSameCell = targetCell.value === startCell.value;
+  Board.prototype.moveCell = function(fx, fy, tx, ty, moveCellAnimate) {
+    var isSameCell, startCell, targetCell;
+    startCell = this.numberCells[fx][fy];
+    targetCell = this.numberCells[tx][ty];
+    isSameCell = startCell === targetCell;
     if (targetCell.value === 0 || isSameCell) {
-      if (this.noBlock(startCell, targetCell)) {
-        return false;
-      }
       if (isSameCell) {
         if (targetCell.merged) {
           return false;
@@ -157,16 +172,13 @@ Board = (function() {
 
   Board.prototype.moveLeft = function(moveCellAnimate) {
     var i, j, k, startCell, targetCell, _i, _j, _k;
-    if (!this.canMoveLeft()) {
-      return false;
-    }
     for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 1; _j < 4; j = ++_j) {
         startCell = this.numberCells[i][j];
         if (startCell.value !== 0) {
           for (k = _k = 0; 0 <= j ? _k < j : _k > j; k = 0 <= j ? ++_k : --_k) {
             targetCell = this.numberCells[i][k];
-            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(i, j, i, k, moveCellAnimate)) {
               break;
             } else {
               continue;
@@ -180,16 +192,13 @@ Board = (function() {
 
   Board.prototype.moveRight = function(moveCellAnimate) {
     var i, j, k, startCell, targetCell, _i, _j, _k;
-    if (!this.canMoveRight()) {
-      return false;
-    }
     for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 3; _j > 0; j = --_j) {
         startCell = this.numberCells[i][j - 1];
         if (startCell.value !== 0) {
           for (k = _k = 3; 3 <= j ? _k < j : _k > j; k = 3 <= j ? ++_k : --_k) {
             targetCell = this.numberCells[i][k];
-            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(i, j, i, k, moveCellAnimate)) {
               break;
             } else {
               continue;
@@ -212,7 +221,7 @@ Board = (function() {
         if (startCell.value !== 0) {
           for (k = _k = 0; 0 <= i ? _k < i : _k > i; k = 0 <= i ? ++_k : --_k) {
             targetCell = this.numberCells[k][j];
-            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(i, j, k, j, moveCellAnimate)) {
               break;
             } else {
               continue;
@@ -224,7 +233,7 @@ Board = (function() {
     return true;
   };
 
-  Board.prototype.moveDown = function() {
+  Board.prototype.moveDown = function(moveCellAnimate) {
     var i, j, k, moveCells, startCell, targetCell, _i, _j, _k;
     moveCells = [];
     if (!this.canMoveDown()) {
@@ -236,7 +245,7 @@ Board = (function() {
         if (startCell.value !== 0) {
           for (k = _k = 3; 3 <= i ? _k < i : _k > i; k = 3 <= i ? ++_k : --_k) {
             targetCell = this.numberCells[k][j];
-            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(i, j, k, j, moveCellAnimate)) {
               break;
             } else {
               continue;
