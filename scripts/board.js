@@ -143,7 +143,7 @@ Board = (function() {
       }
       if (isSameCell) {
         if (targetCell.merged) {
-          continue;
+          return false;
         }
         this.score += startCell.value;
         targetCell.merged = true;
@@ -166,8 +166,10 @@ Board = (function() {
         if (startCell.value !== 0) {
           for (k = _k = 0; 0 <= j ? _k < j : _k > j; k = 0 <= j ? ++_k : --_k) {
             targetCell = this.numberCells[i][k];
-            if (moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
               break;
+            } else {
+              continue;
             }
           }
         }
@@ -187,8 +189,10 @@ Board = (function() {
         if (startCell.value !== 0) {
           for (k = _k = 3; 3 <= j ? _k < j : _k > j; k = 3 <= j ? ++_k : --_k) {
             targetCell = this.numberCells[i][k];
-            if (moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
               break;
+            } else {
+              continue;
             }
           }
         }
@@ -208,8 +212,10 @@ Board = (function() {
         if (startCell.value !== 0) {
           for (k = _k = 0; 0 <= i ? _k < i : _k > i; k = 0 <= i ? ++_k : --_k) {
             targetCell = this.numberCells[k][j];
-            if (moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
               break;
+            } else {
+              continue;
             }
           }
         }
@@ -230,8 +236,10 @@ Board = (function() {
         if (startCell.value !== 0) {
           for (k = _k = 3; 3 <= i ? _k < i : _k > i; k = 3 <= i ? ++_k : --_k) {
             targetCell = this.numberCells[k][j];
-            if (moveCell(startCell, targetCell, moveCellAnimate)) {
+            if (this.moveCell(startCell, targetCell, moveCellAnimate)) {
               break;
+            } else {
+              continue;
             }
           }
         }

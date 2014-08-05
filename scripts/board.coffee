@@ -96,7 +96,7 @@ class Board
 			return false if @noBlock startCell, targetCell		
 
 			if isSameCell								# 两个数字块的值相等			
-				continue if targetCell.merged			# 如果已经有合并, 直接进入下次循环
+				return false if targetCell.merged 		# 如果已经有合并, 本目标元素不合适
 				@score += startCell.value				# 数字合并, 奖励分数
 				targetCell.merged = true				# 标记本航道已经有数字相加了
 			
@@ -116,7 +116,7 @@ class Board
 					for k in [0...j]					
 						targetCell = @numberCells[i][k]
 						# 如果数字块滑动成功
-						break if moveCell startCell, targetCell, moveCellAnimate				
+						if @moveCell startCell, targetCell, moveCellAnimate then break else continue			
 		return true
 	
 	moveRight: (moveCellAnimate) ->
@@ -128,7 +128,7 @@ class Board
 				if startCell.value isnt 0			# 待滑动数字块
 					for k in [3...j]
 						targetCell = @numberCells[i][k]
-						break if moveCell startCell, targetCell, moveCellAnimate
+						if @moveCell startCell, targetCell, moveCellAnimate then break else continue
 		return true
 	
 	moveUp: (moveCellAnimate) ->
@@ -140,7 +140,7 @@ class Board
 				if startCell.value isnt 0					
 					for k in [0...i]					
 						targetCell = @numberCells[k][j]
-						break if moveCell startCell, targetCell, moveCellAnimate
+						if @moveCell startCell, targetCell, moveCellAnimate then break else continue
 		return true
 
 	moveDown: () ->
@@ -153,7 +153,7 @@ class Board
 				if startCell.value isnt 0					
 					for k in [3...i]					
 						targetCell = @numberCells[k][j]
-						break if moveCell startCell, targetCell, moveCellAnimate
+						if @moveCell startCell, targetCell, moveCellAnimate then break else continue
 		return true
 						
 
