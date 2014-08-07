@@ -31,7 +31,7 @@ Board = (function() {
       randX = +Math.floor(Math.random() * 4);
       randY = +Math.floor(Math.random() * 4);
     }
-    randNumberCell.value = Math.random() < 0.5 ? 2 : 4;
+    randNumberCell.value = Math.random() < 0.9 ? 2 : 4;
     return randNumberCell;
   };
 
@@ -165,7 +165,6 @@ Board = (function() {
       }
       targetCell.value += startCell.value;
       startCell.value = 0;
-      moveCellAnimate(startCell, targetCell);
       return true;
     }
   };

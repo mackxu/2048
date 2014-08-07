@@ -24,7 +24,7 @@ class Board
 			randY = +Math.floor(Math.random() * 4)
 		# console.log times + 'times'
 		# 在随机位置上显示随机数字
-		randNumberCell.value = if Math.random() < 0.5 then 2 else 4
+		randNumberCell.value = if Math.random() < 0.9 then 2 else 4
 		return randNumberCell
 	
 	# 更新numberCells, 并用回调显示到界面里
@@ -122,7 +122,7 @@ class Board
 			targetCell.value += startCell.value
 			startCell.value = 0
 			# console.log startCell, targetCell
-			moveCellAnimate startCell, targetCell
+			# moveCellAnimate startCell, targetCell
 			return true
 
 	moveLeft: (moveCellAnimate) ->	
