@@ -3,16 +3,17 @@ var App;
 
 App = (function() {
   function App($gridContainer) {
-    var i, j, _i, _j;
+    var $gridCellViews, i, j, _i, _j;
     this.$gridContainer = $gridContainer;
     this.cellSideLength = 100;
     this.cellSpace = 20;
     this.borderRadius = 10;
     this.createResponeBoard();
     this.$numberCellViews = $('.number-cell');
+    $gridCellViews = $('.grid-cell');
     for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 0; _j < 4; j = ++_j) {
-        $("#grid-cell-" + i + "-" + j).css({
+        $($gridCellViews[4 * i + j]).css({
           width: this.cellSideLength,
           height: this.cellSideLength,
           borderRadius: this.borderRadius,
@@ -25,20 +26,18 @@ App = (function() {
 
   App.prototype.startGame = function() {
     this.board = new Board();
-    this.numberCells = this.board.numberCells;
     this.updateBoardView();
     this.showOneNumber();
     this.showOneNumber();
   };
 
   App.prototype.updateBoardView = function() {
-    this.board.updateNumbercells((function(_this) {
+    this.board.updateAllcells((function(_this) {
       return function(numberCell) {
-        var cellNode, number, x, y;
-        x = numberCell.x, y = numberCell.y;
+        var cellNode, value, x, y;
+        x = numberCell.x, y = numberCell.y, value = numberCell.value;
         cellNode = $("#number-cell-" + x + "-" + y).css('display', 'none');
-        number = numberCell.value;
-        if (number === 0) {
+        if (value === 0) {
           cellNode.css({
             width: 0,
             height: 0,
@@ -54,9 +53,9 @@ App = (function() {
             left: _this.getPosLeft(x, y),
             color: numberCell.getColor(),
             backgroundColor: numberCell.getBgColor()
-          }).text(number);
+          }).text(value);
         }
-        cellNode.css('display', 'block');
+        return cellNode.css('display', 'block');
       };
     })(this));
   };
@@ -92,47 +91,30 @@ App = (function() {
   };
 
   App.prototype.showOneNumber = function() {
-    var i, j, numberCell;
-    if ((numberCell = this.board.generateOneNumber())) {
-      i = numberCell.x;
-      j = numberCell.y;
-      $("#number-cell-" + i + "-" + j).css({
-        color: numberCell.getColor(),
-        backgroundColor: numberCell.getBgColor()
-      }).text(numberCell.value).animate({
-        width: this.cellSideLength,
-        height: this.cellSideLength,
-        top: this.getPosTop(i, j),
-        left: this.getPosLeft(i, j)
-      }, 50);
-    }
-  };
-
-  App.prototype.showOneNumber = function() {
-    var i, j, numberCell;
-    if ((numberCell = this.board.generateOneNumber())) {
-      i = numberCell.x;
-      j = numberCell.y;
-      $("#number-cell-" + i + "-" + j).text(numberCell.value).animate({
-        width: this.cellSideLength,
-        height: this.cellSideLength,
-        top: this.getPosTop(i, j),
-        left: this.getPosLeft(i, j)
-      }, 50);
-    }
+    this.board.generateOneNumber((function(_this) {
+      return function(numberCell) {
+        var value, x, y;
+        x = numberCell.x, y = numberCell.y, value = numberCell.value;
+        $(_this.$numberCellViews[x * 4 + y]).css({
+          color: numberCell.getColor(),
+          backgroundColor: numberCell.getBgColor(),
+          width: _this.cellSideLength,
+          height: _this.cellSideLength,
+          top: _this.getPosTop(x, y),
+          left: _this.getPosLeft(x, y)
+        }).text(value);
+      };
+    })(this));
   };
 
   App.prototype.showMoveNumber = function(moveCells) {
     var end, start;
     start = moveCells[0];
     end = moveCells[1];
-    $("#number-cell-" + start.x + "-" + start.y).animate({
+    $(this.$numberCellViews[4 * start.x + start.y]).animate({
       top: this.getPosTop(end.x, end.y),
       left: this.getPosLeft(end.x, end.y)
-    }, 200).css({
-      top: this.getPosTop(end.x, end.y),
-      left: this.getPosLeft(end.x, end.y)
-    });
+    }, 200);
   };
 
   App.prototype.getPosLeft = function(i, j) {

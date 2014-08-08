@@ -6,12 +6,14 @@ class App
 		# 准备响应式的面板
 		@createResponeBoard()
 
-		# 获取所有数字块
-		@$numberCellViews = $('.number-cell');
+		
+		@$numberCellViews = $('.number-cell');			# 获取所有数字块
+
 		# 动态生成棋盘格
+		$gridCellViews = $('.grid-cell');
 		for i in [0...4]
 			for j in [0...4]
-				$("#grid-cell-#{i}-#{j}").css(
+				$($gridCellViews[4 * i + j]).css(
 					width: @cellSideLength
 					height: @cellSideLength
 					borderRadius: @borderRadius
@@ -21,44 +23,18 @@ class App
 		
 	startGame: () -> 
 		@board = new Board()
-		@numberCells = @board.numberCells
 		@updateBoardView()
 
 		@showOneNumber()
 		@showOneNumber()
 		return
 	
-	# updateBoardView: () ->
-	# 	# 动画后, 根据最新数值重绘所有数字块
-	# 	for rowCells, i in @numberCells
-	# 		for cell, j in rowCells
-	# 			cellNode = $("#number-cell-#{i}-#{j}").css('display', 'none')
-	# 			number = cell.value
-	# 			if number is 0
-	# 				cellNode.css({
-	# 					width: 0
-	# 					height: 0
-	# 					top: @getPosTop(i, j) + @cellSideLength / 2
-	# 					left: @getPosLeft(i, j) + @cellSideLength / 2
-	# 				}).text('')
-	# 			else 
-	# 				cellNode.css({
-	# 					width: @cellSideLength
-	# 					height: @cellSideLength
-	# 					lineHeight: @cellSideLength + 'px'
-	# 					top: @getPosTop(i, j)
-	# 					left: @getPosLeft(i, j)
-	# 					color: cell.getColor()
-	# 					backgroundColor: cell.getBgColor() 
-	# 				}).text(number)
-	# 			cellNode.css('display', 'block')
-	# 	return
 	updateBoardView: () ->
-		@board.updateNumbercells( (numberCell) => 
-			{ x, y } = numberCell
+		@board.updateAllcells( (numberCell) => 
+			{ x, y, value } = numberCell
 			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
-			number = numberCell.value
-			if number is 0
+			# cellNode = $(@$numberCellViews[x * 4 + y])
+			if value is 0
 				cellNode.css({
 					width: 0
 					height: 0
@@ -74,18 +50,11 @@ class App
 					left: @getPosLeft(x, y)
 					color: numberCell.getColor()
 					backgroundColor: numberCell.getBgColor() 
-				}).text(number)
+				}).text(value)
 			cellNode.css('display', 'block')
-			return
 		)
 		return
-	# updateBoardView: () ->
-	# 	@board.updateNumbercells((numberCell) =>
-	# 		index = numberCell.x * 4 + numberCell.y;
-	# 		numberCellView = @$numberCellViews[index];
-	# 		numberCellView.innerText = numberCell.value or ''
-	# 	)
-	# 	return 
+
 	createResponeBoard: () ->
 		documentWidth = window.screen.availWidth
 		if documentWidth > 499 
@@ -116,56 +85,40 @@ class App
 		return
 			
 	
-	showOneNumber: () ->
-		# console.log RandNumberCell = @board.generateOneNumber()
-		if(numberCell = @board.generateOneNumber())
-			i = numberCell.x
-			j = numberCell.y
-
-			$("#number-cell-#{i}-#{j}")
+	showOneNumber:() ->
+		@board.generateOneNumber( (numberCell) =>
+			# 动画显示一个数字块
+			{ x, y, value } = numberCell
+			
+			$(@$numberCellViews[x * 4 + y])
 				.css({
 					color: numberCell.getColor()
 					backgroundColor: numberCell.getBgColor()
+					width: @cellSideLength
+					height: @cellSideLength
+					top: @getPosTop(x, y)
+					left: @getPosLeft(x, y)
 				})
-				.text(numberCell.value)
-				.animate({
-					width: @cellSideLength
-					height: @cellSideLength
-					top: @getPosTop(i, j)
-					left: @getPosLeft(i, j)
-				}, 50) 
-		return
-
-	showOneNumber: () ->
-		# console.log RandNumberCell = @board.generateOneNumber()
-		if(numberCell = @board.generateOneNumber())
-			i = numberCell.x
-			j = numberCell.y
-
-			$("#number-cell-#{i}-#{j}")
-				.text(numberCell.value)
-				.animate({
-					width: @cellSideLength
-					height: @cellSideLength
-					top: @getPosTop(i, j)
-					left: @getPosLeft(i, j)
-				}, 50)
-				 
+				.text( value )
+				# .animate({
+				# 	width: @cellSideLength
+				# 	height: @cellSideLength
+				# 	top: @getPosTop(x, y)
+				# 	left: @getPosLeft(x, y)
+				# }, 50) 
+			return
+		)
 		return
 
 	showMoveNumber: (moveCells) ->
 		start = moveCells[0]
 		end = moveCells[1]
-		# console.log start, end
-		$("#number-cell-#{start.x}-#{start.y}")
+		
+		$(@$numberCellViews[4 * start.x + start.y])
 			.animate({
 				top: @getPosTop(end.x, end.y)
 				left: @getPosLeft(end.x, end.y)
 				}, 200)
-			.css({
-				top: @getPosTop(end.x, end.y)
-				left: @getPosLeft(end.x, end.y)
-				})
 		return
 	getPosLeft: (i, j) ->
 		@cellSpace + j * (@cellSpace + @cellSideLength) 
