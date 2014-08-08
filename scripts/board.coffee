@@ -10,7 +10,7 @@ class Board
 				@numberCells[i][j] = new Number(0, i, j)
 
 	generateOneNumber: () ->
-		return false if (@noSpace())
+		# return false if (@noSpace())
 		times = 0
 		# 获取随机位置
 		randX = +Math.floor(Math.random() * 4)
@@ -39,32 +39,36 @@ class Board
 		# 判断是否有空位显示新数字
 		for i in [0...4]
 			for j in [0...4]
-				return true if @numberCells[i][j] is 0
-		return false
+				return false if @numberCells[i][j].value is 0
+		return true
 	canMoveLeft: () ->
 		# 向左滑动前，检查是否能滑动
 		# 滑动规定：1. 2.
 		for i in [0...4]
 			for j in [1...4]
-				if @numberCells[i][j].value != 0
-					if @numberCells[i][j-1].value is 0 or @numberCells[i][j-1].value is @numberCells[i][j].value
-						return true 
+				prevCell = @numberCells[i][j-1]
+				curCell = @numberCells[i][j]
+				
+				if prevCell.value is 0 or curCell.value is prevCell.value
+					return true 
 		return false
 					
 	canMoveRight: () ->
-		for rowCells in @numberCells
+		for i in [0...4]
 			for j in [3...0]
-				# rowCells[j-1]是否能向右移动
-				if rowCells[j-1].value isnt 0
-					if rowCells[j].value is 0 or rowCells[j] is rowCells[j-1]
-						return true 
+				prevCell = @numberCells[i][j]
+				curCell = @numberCells[i][j-1]
+
+				if prevCell.value is 0 or curCell.value is prevCell.value
+					return true 
 		return false
 	canMoveUp: () ->
 		for j in [0...4]
 			for i in [1...4]			
 				prevCell = @numberCells[i-1][j]
 				curCell = @numberCells[i][j]
-				if prevCell is 0 or prevCell.value is curCell.value
+
+				if prevCell.value is 0 or curCell.value is prevCell.value
 					return true
 		return false
 	canMoveDown: () ->
@@ -72,7 +76,7 @@ class Board
 			for i in [3...0]			
 				prevCell = @numberCells[i][j]
 				curCell = @numberCells[i-1][j]
-				if prevCell is 0 or prevCell.value is curCell.value
+				if prevCell.value is 0 or curCell.value is prevCell.value
 					return true
 		return false
 	noBlock: (start, end) ->
@@ -109,7 +113,7 @@ class Board
 		# 如果两个数字块相等
 		startCell = @numberCells[fx][fy]
 		targetCell = @numberCells[tx][ty]
-		isSameCell = startCell is targetCell
+		isSameCell = startCell.value is targetCell.value
 		if targetCell.value is 0 or isSameCell
 			# 数据块之间有障碍物, 返回false
 			# return false if not @noBlock startCell, targetCell		
@@ -124,6 +128,7 @@ class Board
 			# console.log startCell, targetCell
 			# moveCellAnimate startCell, targetCell
 			return true
+		return false
 
 	moveLeft: (moveCellAnimate) ->	
 		# return false unless @canMoveLeft()
@@ -142,8 +147,8 @@ class Board
 		# return false unless @canMoveRight()
 
 		for i in [0...4]
-			for j in [3...0]
-				startCell = @numberCells[i][j-1]
+			for j in [2..0]
+				startCell = @numberCells[i][j]
 				if startCell.value isnt 0			# 待滑动数字块
 					for k in [3...j]
 						targetCell = @numberCells[i][k]
@@ -167,8 +172,8 @@ class Board
 		return false unless @canMoveDown()
 
 		for j in [0...4]			
-			for i in [3...0]
-				startCell = @numberCells[i-1][j]			
+			for i in [2..0]
+				startCell = @numberCells[i][j]			
 				if startCell.value isnt 0					
 					for k in [3...i]					
 						targetCell = @numberCells[k][j]

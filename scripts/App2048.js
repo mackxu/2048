@@ -9,6 +9,7 @@ App = (function() {
     this.cellSpace = 20;
     this.borderRadius = 10;
     this.createResponeBoard();
+    this.$numberCellViews = $('.number-cell');
     for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 0; _j < 4; j = ++_j) {
         $("#grid-cell-" + i + "-" + j).css({
@@ -26,16 +27,8 @@ App = (function() {
     this.board = new Board();
     this.numberCells = this.board.numberCells;
     this.updateBoardView();
-    setTimeout((function(_this) {
-      return function() {
-        return _this.showOneNumber();
-      };
-    })(this), 25);
-    setTimeout((function(_this) {
-      return function() {
-        return _this.showOneNumber();
-      };
-    })(this), 25);
+    this.showOneNumber();
+    this.showOneNumber();
   };
 
   App.prototype.updateBoardView = function() {
@@ -93,16 +86,8 @@ App = (function() {
       };
     })(this));
     if (canMove) {
-      setTimeout((function(_this) {
-        return function() {
-          _this.updateBoardView();
-        };
-      })(this), 500);
-      setTimeout((function(_this) {
-        return function() {
-          _this.showOneNumber();
-        };
-      })(this), 750);
+      this.updateBoardView();
+      this.showOneNumber();
     }
   };
 
@@ -115,6 +100,20 @@ App = (function() {
         color: numberCell.getColor(),
         backgroundColor: numberCell.getBgColor()
       }).text(numberCell.value).animate({
+        width: this.cellSideLength,
+        height: this.cellSideLength,
+        top: this.getPosTop(i, j),
+        left: this.getPosLeft(i, j)
+      }, 50);
+    }
+  };
+
+  App.prototype.showOneNumber = function() {
+    var i, j, numberCell;
+    if ((numberCell = this.board.generateOneNumber())) {
+      i = numberCell.x;
+      j = numberCell.y;
+      $("#number-cell-" + i + "-" + j).text(numberCell.value).animate({
         width: this.cellSideLength,
         height: this.cellSideLength,
         top: this.getPosTop(i, j),

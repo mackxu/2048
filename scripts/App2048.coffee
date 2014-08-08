@@ -6,6 +6,8 @@ class App
 		# 准备响应式的面板
 		@createResponeBoard()
 
+		# 获取所有数字块
+		@$numberCellViews = $('.number-cell');
 		# 动态生成棋盘格
 		for i in [0...4]
 			for j in [0...4]
@@ -22,12 +24,8 @@ class App
 		@numberCells = @board.numberCells
 		@updateBoardView()
 
-		setTimeout(=>
-			@showOneNumber()
-		, 25)
-		setTimeout(=>
-			@showOneNumber()
-		, 25)
+		@showOneNumber()
+		@showOneNumber()
 		return
 	
 	# updateBoardView: () ->
@@ -81,6 +79,13 @@ class App
 			return
 		)
 		return
+	# updateBoardView: () ->
+	# 	@board.updateNumbercells((numberCell) =>
+	# 		index = numberCell.x * 4 + numberCell.y;
+	# 		numberCellView = @$numberCellViews[index];
+	# 		numberCellView.innerText = numberCell.value or ''
+	# 	)
+	# 	return 
 	createResponeBoard: () ->
 		documentWidth = window.screen.availWidth
 		if documentWidth > 499 
@@ -105,15 +110,9 @@ class App
 		)
 		if canMove
 			# 刷新棋盘格
-			setTimeout( =>
-				@updateBoardView()
-				return 
-			, 500)
-
-			setTimeout( => 
-				@showOneNumber()
-				return
-			, 750)
+			@updateBoardView()
+			@showOneNumber()
+			
 		return
 			
 	
@@ -136,6 +135,24 @@ class App
 					left: @getPosLeft(i, j)
 				}, 50) 
 		return
+
+	showOneNumber: () ->
+		# console.log RandNumberCell = @board.generateOneNumber()
+		if(numberCell = @board.generateOneNumber())
+			i = numberCell.x
+			j = numberCell.y
+
+			$("#number-cell-#{i}-#{j}")
+				.text(numberCell.value)
+				.animate({
+					width: @cellSideLength
+					height: @cellSideLength
+					top: @getPosTop(i, j)
+					left: @getPosLeft(i, j)
+				}, 50)
+				 
+		return
+
 	showMoveNumber: (moveCells) ->
 		start = moveCells[0]
 		end = moveCells[1]

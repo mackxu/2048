@@ -16,9 +16,6 @@ Board = (function() {
 
   Board.prototype.generateOneNumber = function() {
     var randNumberCell, randX, randY, times;
-    if (this.noSpace()) {
-      return false;
-    }
     times = 0;
     randX = +Math.floor(Math.random() * 4);
     randY = +Math.floor(Math.random() * 4);
@@ -52,7 +49,21 @@ Board = (function() {
     var i, j, _i, _j;
     for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 0; _j < 4; j = ++_j) {
-        if (this.numberCells[i][j] === 0) {
+        if (this.numberCells[i][j].value === 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  Board.prototype.canMoveLeft = function() {
+    var curCell, i, j, prevCell, _i, _j;
+    for (i = _i = 0; _i < 4; i = ++_i) {
+      for (j = _j = 1; _j < 4; j = ++_j) {
+        prevCell = this.numberCells[i][j - 1];
+        curCell = this.numberCells[i][j];
+        if (prevCell.value === 0 || curCell.value === prevCell.value) {
           return true;
         }
       }
@@ -60,30 +71,14 @@ Board = (function() {
     return false;
   };
 
-  Board.prototype.canMoveLeft = function() {
-    var i, j, _i, _j;
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 1; _j < 4; j = ++_j) {
-        if (this.numberCells[i][j].value !== 0) {
-          if (this.numberCells[i][j - 1].value === 0 || this.numberCells[i][j - 1].value === this.numberCells[i][j].value) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  };
-
   Board.prototype.canMoveRight = function() {
-    var j, rowCells, _i, _j, _len, _ref;
-    _ref = this.numberCells;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      rowCells = _ref[_i];
+    var curCell, i, j, prevCell, _i, _j;
+    for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 3; _j > 0; j = --_j) {
-        if (rowCells[j - 1].value !== 0) {
-          if (rowCells[j].value === 0 || rowCells[j] === rowCells[j - 1]) {
-            return true;
-          }
+        prevCell = this.numberCells[i][j];
+        curCell = this.numberCells[i][j - 1];
+        if (prevCell.value === 0 || curCell.value === prevCell.value) {
+          return true;
         }
       }
     }
@@ -96,7 +91,7 @@ Board = (function() {
       for (i = _j = 1; _j < 4; i = ++_j) {
         prevCell = this.numberCells[i - 1][j];
         curCell = this.numberCells[i][j];
-        if (prevCell === 0 || prevCell.value === curCell.value) {
+        if (prevCell.value === 0 || curCell.value === prevCell.value) {
           return true;
         }
       }
@@ -110,7 +105,7 @@ Board = (function() {
       for (i = _j = 3; _j > 0; i = --_j) {
         prevCell = this.numberCells[i][j];
         curCell = this.numberCells[i - 1][j];
-        if (prevCell === 0 || prevCell.value === curCell.value) {
+        if (prevCell.value === 0 || curCell.value === prevCell.value) {
           return true;
         }
       }
@@ -154,7 +149,7 @@ Board = (function() {
     var isSameCell, startCell, targetCell;
     startCell = this.numberCells[fx][fy];
     targetCell = this.numberCells[tx][ty];
-    isSameCell = startCell === targetCell;
+    isSameCell = startCell.value === targetCell.value;
     if (targetCell.value === 0 || isSameCell) {
       if (isSameCell) {
         if (targetCell.merged) {
@@ -167,6 +162,7 @@ Board = (function() {
       startCell.value = 0;
       return true;
     }
+    return false;
   };
 
   Board.prototype.moveLeft = function(moveCellAnimate) {
@@ -192,8 +188,8 @@ Board = (function() {
   Board.prototype.moveRight = function(moveCellAnimate) {
     var i, j, k, startCell, targetCell, _i, _j, _k;
     for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 3; _j > 0; j = --_j) {
-        startCell = this.numberCells[i][j - 1];
+      for (j = _j = 2; _j >= 0; j = --_j) {
+        startCell = this.numberCells[i][j];
         if (startCell.value !== 0) {
           for (k = _k = 3; 3 <= j ? _k < j : _k > j; k = 3 <= j ? ++_k : --_k) {
             targetCell = this.numberCells[i][k];
@@ -239,8 +235,8 @@ Board = (function() {
       return false;
     }
     for (j = _i = 0; _i < 4; j = ++_i) {
-      for (i = _j = 3; _j > 0; i = --_j) {
-        startCell = this.numberCells[i - 1][j];
+      for (i = _j = 2; _j >= 0; i = --_j) {
+        startCell = this.numberCells[i][j];
         if (startCell.value !== 0) {
           for (k = _k = 3; 3 <= i ? _k < i : _k > i; k = 3 <= i ? ++_k : --_k) {
             targetCell = this.numberCells[k][j];
