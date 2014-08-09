@@ -5,6 +5,7 @@ Board = (function() {
   function Board(opts) {
     var i, j, _i, _j;
     this.numberCells = [];
+    this.numberCellHelper = [];
     this.score = 0;
     for (i = _i = 0; _i < 4; i = ++_i) {
       this.numberCells[i] = [];
@@ -15,21 +16,14 @@ Board = (function() {
   }
 
   Board.prototype.generateOneNumber = function(showNumberAnimate) {
-    var randNumberCell, randX, randY;
-    if (this.noSpace()) {
+    var availCellNum, randNumberCell;
+    availCellNum = this.numberCellHelper.length;
+    if (availCellNum === 0) {
       return false;
     }
-    randX = +Math.floor(Math.random() * 4);
-    randY = +Math.floor(Math.random() * 4);
-    while (true) {
-      randNumberCell = this.numberCells[randX][randY];
-      if (randNumberCell.value === 0) {
-        break;
-      }
-      randX = +Math.floor(Math.random() * 4);
-      randY = +Math.floor(Math.random() * 4);
-    }
+    randNumberCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
     randNumberCell.value = Math.random() < 0.9 ? 2 : 4;
+    console.log(this.numberCells);
     if (typeof showNumberAnimate === "function") {
       showNumberAnimate(randNumberCell);
     }
@@ -38,12 +32,16 @@ Board = (function() {
 
   Board.prototype.updateAllcells = function(showOneNumber) {
     var cell, rowCells, _i, _j, _len, _len1, _ref;
+    this.numberCellHelper = [];
     _ref = this.numberCells;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       rowCells = _ref[_i];
       for (_j = 0, _len1 = rowCells.length; _j < _len1; _j++) {
         cell = rowCells[_j];
         cell.merged = false;
+        if (cell.value === 0) {
+          this.numberCellHelper.push(cell);
+        }
         showOneNumber(cell);
       }
     }

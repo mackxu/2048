@@ -26,6 +26,7 @@ App = (function() {
 
   App.prototype.startGame = function() {
     this.board = new Board();
+    this.isGameOver = false;
     this.updateBoardView();
     this.showOneNumber();
     this.showOneNumber();
@@ -55,7 +56,6 @@ App = (function() {
         x = numberCell.x, y = numberCell.y, value = numberCell.value;
         cellNode = $("#number-cell-" + x + "-" + y).css('display', 'none');
         _ref = [_this.getPosLeft(x, y), _this.getPosTop(x, y)], posX = _ref[0], posY = _ref[1];
-        console.log(posX, posY, value);
         if (value === 0) {
           cellNode.css({
             width: 0,
@@ -134,7 +134,12 @@ App = (function() {
     return this.cellSpace + i * (this.cellSpace + this.cellSideLength);
   };
 
-  App.prototype.isGameOver = function() {};
+  App.prototype.gameOver = function() {
+    if (this.isGameOver) {
+      return false;
+    }
+    return this.isGameOver = this.board.noMove();
+  };
 
   return App;
 
@@ -150,25 +155,25 @@ $(function() {
       case 37:
         appGame.moveCell('moveLeft');
         setTimeout(function() {
-          appGame.isGameOver();
+          appGame.gameOver();
         }, 300);
         break;
       case 38:
         appGame.moveCell('moveUp');
         setTimeout(function() {
-          appGame.isGameOver();
+          appGame.gameOver();
         }, 300);
         break;
       case 39:
         appGame.moveCell('moveRight');
         setTimeout(function() {
-          appGame.isGameOver();
+          appGame.gameOver();
         }, 300);
         break;
       case 40:
         appGame.moveCell('moveDown');
         setTimeout(function() {
-          appGame.isGameOver();
+          appGame.gameOver();
         }, 300);
         break;
       default:

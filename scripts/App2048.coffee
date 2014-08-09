@@ -23,8 +23,9 @@ class App
 		
 	startGame: () -> 
 		@board = new Board()
+		@isGameOver = false
+		
 		@updateBoardView()
-
 		@showOneNumber()
 		@showOneNumber()
 		return
@@ -51,7 +52,6 @@ class App
 			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
 			# cellNode = $(@$numberCellViews[x * 4 + y])
 			[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
-			console.log posX, posY, value
 			
 			if value is 0
 				cellNode.css({
@@ -125,8 +125,10 @@ class App
 		@cellSpace + j * (@cellSpace + @cellSideLength) 
 	getPosTop: (i, j) -> 
 		@cellSpace + i * (@cellSpace + @cellSideLength)
-	isGameOver: () ->
-		#
+	gameOver: () ->
+		# 如果数据块在四个方向都不能移动了, 本次游戏结束
+		return false if @isGameOver
+		@isGameOver = @board.noMove()
 
 # 执行程序
 $ -> 
@@ -138,28 +140,28 @@ $ ->
 			when 37
 				appGame.moveCell('moveLeft')
 				setTimeout( -> 
-					appGame.isGameOver()
+					appGame.gameOver()
 					return
 				, 300)
 				return
 			when 38
 				appGame.moveCell('moveUp')
 				setTimeout( -> 
-					appGame.isGameOver()
+					appGame.gameOver()
 					return
 				, 300)
 				return
 			when 39
 				appGame.moveCell('moveRight')
 				setTimeout( -> 
-					appGame.isGameOver()
+					appGame.gameOver()
 					return
 				, 300)
 				return
 			when 40
 				appGame.moveCell('moveDown')
 				setTimeout( -> 
-					appGame.isGameOver()
+					appGame.gameOver()
 					return
 				, 300)
 				return

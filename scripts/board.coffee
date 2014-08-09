@@ -1,6 +1,7 @@
 class Board
 	constructor: (opts) ->
-		@numberCells = []
+		@numberCells = []				# 存放二维数组
+		@numberCellHelper = []			# 动态一维数组, 存放值为0的数据块
 		@score = 0
 
 		# 初始化棋盘数字
@@ -10,28 +11,26 @@ class Board
 				@numberCells[i][j] = new Number(0, i, j)
 
 	generateOneNumber: (showNumberAnimate) ->
-		return false if (@noSpace())
+		availCellNum = @numberCellHelper.length
+		
+		# 当数字块排满的时
+		return false if availCellNum is 0
 		# 获取随机位置
-		randX = +Math.floor(Math.random() * 4)
-		randY = +Math.floor(Math.random() * 4)		
-		while(true)
-			randNumberCell = @numberCells[randX][randY]
-			# 如果获取的位置为空, 结束循环
-			break if randNumberCell.value is 0 
-
-			randX = +Math.floor(Math.random() * 4)
-			randY = +Math.floor(Math.random() * 4)
-
+		randNumberCell = @numberCellHelper[(Math.random() * availCellNum) | 0]
 		# 在随机位置上显示随机数字
 		randNumberCell.value = if Math.random() < 0.9 then 2 else 4
+		console.log @numberCells
 		showNumberAnimate? randNumberCell
 		return true
 	
 	# 把每个数据在数据块内显示
 	updateAllcells: (showOneNumber) ->
+		@numberCellHelper = []							# 清空之前的内容
 		for rowCells in @numberCells
 			for cell in rowCells
 				cell.merged = false
+				# 存放值为0的数字块对象
+				@numberCellHelper.push(cell) if cell.value is 0
 				showOneNumber cell
 		return
 	
@@ -117,7 +116,7 @@ class Board
 	
 	noMove: () ->
 		# 不能移动，游戏结束
-		if @canMoveLeft or @canMoveRight or @canMoveUp or @canMoveDown then false else true
+		return if @canMoveLeft or @canMoveRight or @canMoveUp or @canMoveDown then false else true
 	
 	moveLeft: (moveCellAnimate) ->	
 		return false unless @canMoveLeft()
