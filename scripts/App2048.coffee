@@ -29,32 +29,6 @@ class App
 		@showOneNumber()
 		return
 	
-	updateBoardView: () ->
-		@board.updateAllcells( (numberCell) => 
-			{ x, y, value } = numberCell
-			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
-			# cellNode = $(@$numberCellViews[x * 4 + y])
-			if value is 0
-				cellNode.css({
-					width: 0
-					height: 0
-					top: @getPosTop(x, y) + @cellSideLength / 2
-					left: @getPosLeft(x, y) + @cellSideLength / 2
-				}).text('')
-			else 
-				cellNode.css({
-					width: @cellSideLength
-					height: @cellSideLength
-					lineHeight: @cellSideLength + 'px'
-					top: @getPosTop(x, y)
-					left: @getPosLeft(x, y)
-					color: numberCell.getColor()
-					backgroundColor: numberCell.getBgColor() 
-				}).text(value)
-			cellNode.css('display', 'block')
-		)
-		return
-
 	createResponeBoard: () ->
 		documentWidth = window.screen.availWidth
 		if documentWidth > 499 
@@ -70,7 +44,37 @@ class App
 			borderRadius: @borderRadius
 		})
 		return
-	
+
+	updateBoardView: () ->
+		@board.updateAllcells( (numberCell) => 
+			{ x, y, value } = numberCell
+			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
+			# cellNode = $(@$numberCellViews[x * 4 + y])
+			[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
+			console.log posX, posY, value
+			
+			if value is 0
+				cellNode.css({
+					width: 0
+					height: 0
+					top: posY + @cellSideLength / 2
+					left: posX + @cellSideLength / 2
+					color: 'inherit'
+					backgroundColor: 'transparent'
+				}).text('')
+			else 
+				cellNode.css({
+					width: @cellSideLength
+					height: @cellSideLength
+					lineHeight: @cellSideLength + 'px'
+					top: posY
+					left: posX
+					color: numberCell.getColor()
+					backgroundColor: numberCell.getBgColor() 
+				}).text(value)
+			cellNode.css('display', 'block')
+		)
+		return
 	
 	moveCell: (moveAction) ->
 		canMove = @board[moveAction]( => 
@@ -78,10 +82,11 @@ class App
 			return
 		)
 		if canMove
-			# 刷新棋盘格
-			@updateBoardView()
-			@showOneNumber()
-			
+			# 每次滑动后, 刷新棋盘格并生成新数字块
+			setTimeout( =>
+				@updateBoardView()
+				@showOneNumber()			
+			, 300)	
 		return
 			
 	
@@ -94,18 +99,14 @@ class App
 				.css({
 					color: numberCell.getColor()
 					backgroundColor: numberCell.getBgColor()
+				})
+				.text( value )
+				.animate({
 					width: @cellSideLength
 					height: @cellSideLength
 					top: @getPosTop(x, y)
 					left: @getPosLeft(x, y)
-				})
-				.text( value )
-				# .animate({
-				# 	width: @cellSideLength
-				# 	height: @cellSideLength
-				# 	top: @getPosTop(x, y)
-				# 	left: @getPosLeft(x, y)
-				# }, 50) 
+				}, 50) 
 			return
 		)
 		return
@@ -118,7 +119,7 @@ class App
 			.animate({
 				top: @getPosTop(end.x, end.y)
 				left: @getPosLeft(end.x, end.y)
-				}, 200)
+			}, 200)
 		return
 	getPosLeft: (i, j) ->
 		@cellSpace + j * (@cellSpace + @cellSideLength) 
@@ -132,7 +133,6 @@ $ ->
 	$gridContainer = $('#grid-container')
 	appGame = new App($gridContainer)
 	$(document).on('keydown', (e) ->
-		console.log e.which
 		e.preventDefault()
 		switch e.which
 			when 37

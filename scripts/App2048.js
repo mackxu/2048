@@ -31,35 +31,6 @@ App = (function() {
     this.showOneNumber();
   };
 
-  App.prototype.updateBoardView = function() {
-    this.board.updateAllcells((function(_this) {
-      return function(numberCell) {
-        var cellNode, value, x, y;
-        x = numberCell.x, y = numberCell.y, value = numberCell.value;
-        cellNode = $("#number-cell-" + x + "-" + y).css('display', 'none');
-        if (value === 0) {
-          cellNode.css({
-            width: 0,
-            height: 0,
-            top: _this.getPosTop(x, y) + _this.cellSideLength / 2,
-            left: _this.getPosLeft(x, y) + _this.cellSideLength / 2
-          }).text('');
-        } else {
-          cellNode.css({
-            width: _this.cellSideLength,
-            height: _this.cellSideLength,
-            lineHeight: _this.cellSideLength + 'px',
-            top: _this.getPosTop(x, y),
-            left: _this.getPosLeft(x, y),
-            color: numberCell.getColor(),
-            backgroundColor: numberCell.getBgColor()
-          }).text(value);
-        }
-        return cellNode.css('display', 'block');
-      };
-    })(this));
-  };
-
   App.prototype.createResponeBoard = function() {
     var documentWidth, gridContainerWidth;
     documentWidth = window.screen.availWidth;
@@ -77,6 +48,39 @@ App = (function() {
     });
   };
 
+  App.prototype.updateBoardView = function() {
+    this.board.updateAllcells((function(_this) {
+      return function(numberCell) {
+        var cellNode, posX, posY, value, x, y, _ref;
+        x = numberCell.x, y = numberCell.y, value = numberCell.value;
+        cellNode = $("#number-cell-" + x + "-" + y).css('display', 'none');
+        _ref = [_this.getPosLeft(x, y), _this.getPosTop(x, y)], posX = _ref[0], posY = _ref[1];
+        console.log(posX, posY, value);
+        if (value === 0) {
+          cellNode.css({
+            width: 0,
+            height: 0,
+            top: posY + _this.cellSideLength / 2,
+            left: posX + _this.cellSideLength / 2,
+            color: 'inherit',
+            backgroundColor: 'transparent'
+          }).text('');
+        } else {
+          cellNode.css({
+            width: _this.cellSideLength,
+            height: _this.cellSideLength,
+            lineHeight: _this.cellSideLength + 'px',
+            top: posY,
+            left: posX,
+            color: numberCell.getColor(),
+            backgroundColor: numberCell.getBgColor()
+          }).text(value);
+        }
+        return cellNode.css('display', 'block');
+      };
+    })(this));
+  };
+
   App.prototype.moveCell = function(moveAction) {
     var canMove;
     canMove = this.board[moveAction]((function(_this) {
@@ -85,8 +89,12 @@ App = (function() {
       };
     })(this));
     if (canMove) {
-      this.updateBoardView();
-      this.showOneNumber();
+      setTimeout((function(_this) {
+        return function() {
+          _this.updateBoardView();
+          return _this.showOneNumber();
+        };
+      })(this), 300);
     }
   };
 
@@ -97,12 +105,13 @@ App = (function() {
         x = numberCell.x, y = numberCell.y, value = numberCell.value;
         $(_this.$numberCellViews[x * 4 + y]).css({
           color: numberCell.getColor(),
-          backgroundColor: numberCell.getBgColor(),
+          backgroundColor: numberCell.getBgColor()
+        }).text(value).animate({
           width: _this.cellSideLength,
           height: _this.cellSideLength,
           top: _this.getPosTop(x, y),
           left: _this.getPosLeft(x, y)
-        }).text(value);
+        }, 50);
       };
     })(this));
   };
@@ -136,7 +145,6 @@ $(function() {
   $gridContainer = $('#grid-container');
   appGame = new App($gridContainer);
   $(document).on('keydown', function(e) {
-    console.log(e.which);
     e.preventDefault();
     switch (e.which) {
       case 37:

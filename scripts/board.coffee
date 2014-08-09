@@ -42,7 +42,7 @@ class Board
 		isSameCell = startCell.value is targetCell.value
 		if targetCell.value is 0 or isSameCell
 			# 数据块之间有障碍物, 返回false
-			return false if not @noBlock startCell, targetCell		
+			return false if not @noBlock fx, fy, tx, ty		
 
 			if isSameCell								# 两个数字块的值相等			
 				return false if targetCell.merged 		# 如果已经有合并, 本目标元素不合适
@@ -56,94 +56,65 @@ class Board
 			return true
 		return false
 
-	updateCell: (fx, fy, tx, ty, moveCellAnimate) ->
-		startCell = @numberCells[fx][fy]
-		targetCell = @numberCells[tx][ty]
-
-		if targetCell.value is 0 and @noBlock startCell, targetCell
-			moveCellAnimate startCell, targetCell
-			targetCell.value = startCell.value
-			startCell.value = 0
-			return true
-		else if targetCell.value is startCell.value and @noBlock startCell, targetCell and not targetCell.merged
-			moveCellAnimate startCell, targetCell
-			targetCell.value += startCell.value
-			targetCell.merged = true
-			@score += startCell.value		
-			startCell.value = 0
-			return true
-		return false
 	noSpace: () ->
 		# 判断是否有空位显示新数字
 		for i in [0...4]
 			for j in [0...4]
 				return false if @numberCells[i][j].value is 0
 		return true
+	
+	noBlock: (x1, y1, x2, y2) ->
+		if y1 is y2
+			if x1 < x2 then x1 += 1 else x1 -= 1
+			for x in [x1...x2]
+				# 如果不为0, 此路不通
+				return false if @numberCells[x][y1].value isnt 0
+		else
+			if y1 < y2 then y1 += 1 else y1 -=1
+			for y in [y1...y2]
+				return false if @numberCells[x1][y].value isnt 0
+		return true
+
 	canMoveLeft: () ->
 		# 向左滑动前，检查是否能滑动
 		# 滑动规定：1. 2.
 		for i in [0...4]
-			for j in [1...4]
-				nextCell = @numberCells[i][j-1]
+			for j in [1...4]		
 				curCell = @numberCells[i][j]
-				
-				if nextCell.value is 0 or curCell.value is nextCell.value
-					return true 
+				if curCell.value isnt 0
+					nextCell = @numberCells[i][j-1]
+					if nextCell.value is 0 or curCell.value is nextCell.value
+						return true 
 		return false
 					
 	canMoveRight: () ->
 		for i in [0...4]
 			for j in [3...0]
-				nextCell = @numberCells[i][j]
 				curCell = @numberCells[i][j-1]
-
-				if nextCell.value is 0 or curCell.value is nextCell.value
-					return true 
+				if curCell.value isnt 0
+					nextCell = @numberCells[i][j]
+					if nextCell.value is 0 or curCell.value is nextCell.value
+						return true 
 		return false
 	canMoveUp: () ->
 		for j in [0...4]
 			for i in [1...4]			
-				nextCell = @numberCells[i-1][j]
 				curCell = @numberCells[i][j]
-
-				if nextCell.value is 0 or curCell.value is nextCell.value
-					return true
+				if curCell.value isnt 0
+					nextCell = @numberCells[i-1][j]
+					if nextCell.value is 0 or curCell.value is nextCell.value
+						return true
 		return false
 	canMoveDown: () ->
 		for j in [0...4]
 			for i in [3...0]			
-				nextCell = @numberCells[i][j]
 				curCell = @numberCells[i-1][j]
-				if nextCell.value is 0 or curCell.value is nextCell.value
-					return true
+				if curCell.value isnt 0
+					nextCell = @numberCells[i][j]
+					if nextCell.value is 0 or curCell.value is nextCell.value
+						return true
 		return false
-	noBlock: (start, end) ->
-		if start.x is end.x
-			# 判断水平方向上是否通路
-			x = start.x
-			if start.y < end.y
-				y1 = start.y + 1
-				y2 = end.y
-			else 
-				y1 = end.y + 1
-				y2 = start.y
-
-			for y in [y1...y2]
-				return @numberCells[x][y] isnt 0
-		else 
-			# 判断垂直方向是否通路
-			y = start.y
-			if start.x < end.x
-				x1 = start.x + 1
-				x2 = end.x
-			else
-				x1 = end.x + 1
-				x2 = start.x
-			
-			for x in [x1...x2]
-				return @numberCells[x][y] isnt 0
-
-		return true
+	
 	noMove: () ->
 		# 不能移动，游戏结束
 		if @canMoveLeft or @canMoveRight or @canMoveUp or @canMoveDown then false else true
