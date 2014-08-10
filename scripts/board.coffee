@@ -1,8 +1,9 @@
 class Board
 	maxNumber = 8192
-	constructor: (opts) ->
+	constructor: () ->
 		@numberCells = []				# 存放二维数组
 		@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
+		@topNumberValue = 0				# 记录数据块最大值
 		@score = 0
 
 		# 初始化棋盘数字
@@ -49,12 +50,16 @@ class Board
 				@score += startCell.value				# 数字合并, 奖励分数
 				targetCell.merged = true				# 标记本航道已经有数字相加了
 			
+			moveCellAnimate startCell, targetCell
 			targetCell.value += startCell.value
 			startCell.value = 0
-			# console.log startCell, targetCell
-			moveCellAnimate startCell, targetCell
+			# 更新数据块最大值
+			@topNumberValue = targetCell.value if isSameCell and @topNumberValue < targetCell.value			
 			return true
 		return false
+	updateScore: (updateScoreView) ->
+		# 更新战绩榜
+		
 	
 	noBlock: (x1, y1, x2, y2) ->
 		if y1 is y2
@@ -160,8 +165,7 @@ class Board
 	gameOver: (gameOverView) ->
 		
 		# 数字达到最大时, 赢得比赛。优于棋盘移动判断
-		for cell in @numberCellHelper
-			return gameOverView true if cell.value is maxNumber
+		return gameOverView true if @topNumberValue is maxNumber
 		# 不能移动，比赛失败
 		return gameOverView false if not @canMoveLeft() and not @canMoveRight() and not @canMoveUp() and not @canMoveDown()
 		return
