@@ -12,6 +12,7 @@ Board = (function() {
     this.numberCellHelper = [];
     this.topNumberValue = 0;
     this.score = 0;
+    this.addScore = 0;
     for (i = _i = 0; _i < 4; i = ++_i) {
       this.numberCells[i] = [];
       for (j = _j = 0; _j < 4; j = ++_j) {
@@ -37,6 +38,7 @@ Board = (function() {
   Board.prototype.updateAllcells = function(showOneNumber) {
     var cell, rowCells, _i, _j, _len, _len1, _ref;
     this.numberCellHelper = [];
+    this.addScore = 0;
     _ref = this.numberCells;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       rowCells = _ref[_i];
@@ -64,7 +66,7 @@ Board = (function() {
         if (targetCell.merged) {
           return false;
         }
-        this.score += startCell.value;
+        this.addScore += startCell.value;
         targetCell.merged = true;
       }
       moveCellAnimate(startCell, targetCell);
@@ -78,7 +80,12 @@ Board = (function() {
     return false;
   };
 
-  Board.prototype.updateScore = function(updateScoreView) {};
+  Board.prototype.updateScore = function(updateScoreView) {
+    if (this.addscore !== 0) {
+      this.score += this.addScore;
+      updateScoreView(this.score);
+    }
+  };
 
   Board.prototype.noBlock = function(x1, y1, x2, y2) {
     var x, y, _i, _j;

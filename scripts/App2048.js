@@ -7,6 +7,7 @@ App = (function() {
     this.$gridContainer = $gridContainer;
     this.createResponeBoard();
     this.$numberCellViews = $('.number-cell');
+    this.$scoreView = $('#J_score');
     $gridCellViews = $('.grid-cell');
     for (i = _i = 0; _i < 4; i = ++_i) {
       for (j = _j = 0; _j < 4; j = ++_j) {
@@ -38,6 +39,7 @@ App = (function() {
     this.cellSideLength = 100;
     this.cellSpace = 20;
     this.borderRadius = 10;
+    this.cellFontSize = 60;
     documentWidth = window.screen.availWidth;
     this.$gridGameOver = $('#J_gameover');
     if (documentWidth < 500) {
@@ -45,18 +47,25 @@ App = (function() {
       this.cellSideLength = 0.2 * documentWidth;
       this.cellSpace = 0.04 * documentWidth;
       this.borderRadius = 0.02 * documentWidth;
+      this.cellFontSize = 48;
       this.$gridContainer.css({
         width: this.gridContainerWidth,
         height: this.gridContainerWidth,
         borderRadius: this.borderRadius
       });
       this.$gridGameOver.css({
-        lineHeight: this.gridContainerWidth
+        lineHeight: this.gridContainerWidth + 'px',
+        borderRadius: this.borderRadius
       });
     }
   };
 
   App.prototype.updateBoardView = function() {
+    this.board.updateScore((function(_this) {
+      return function(score) {
+        _this.$scoreView.text(score);
+      };
+    })(this));
     this.board.updateAllcells((function(_this) {
       return function(numberCell) {
         var cellNode, posX, posY, value, x, y, _ref;
@@ -78,6 +87,7 @@ App = (function() {
             width: _this.cellSideLength,
             height: _this.cellSideLength,
             lineHeight: _this.cellSideLength + 'px',
+            fontSize: _this.cellFontSize,
             top: posY,
             left: posX,
             color: numberCell.getColor(),
@@ -118,6 +128,7 @@ App = (function() {
         x = numberCell.x, y = numberCell.y, value = numberCell.value;
         $(_this.$numberCellViews[x * 4 + y]).css({
           lineHeight: _this.cellSideLength + 'px',
+          fontSize: _this.cellFontSize,
           color: numberCell.getColor(),
           backgroundColor: numberCell.getBgColor()
         }).text(value).animate({

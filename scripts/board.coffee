@@ -4,7 +4,9 @@ class Board
 		@numberCells = []				# 存放二维数组
 		@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
 		@topNumberValue = 0				# 记录数据块最大值
+		
 		@score = 0
+		@addScore = 0
 
 		# 初始化棋盘数字
 		for i in [0...4]
@@ -28,6 +30,7 @@ class Board
 	# 把每个数据在数据块内显示
 	updateAllcells: (showOneNumber) ->
 		@numberCellHelper = []							# 清空之前的内容
+		@addScore = 0									# 清空上次滑动获得的分数
 		for rowCells in @numberCells
 			for cell in rowCells
 				cell.merged = false
@@ -47,7 +50,7 @@ class Board
 
 			if isSameCell								# 两个数字块的值相等			
 				return false if targetCell.merged 		# 如果已经有合并, 本目标元素不合适
-				@score += startCell.value				# 数字合并, 奖励分数
+				@addScore += startCell.value			# 数字合并, 奖励分数
 				targetCell.merged = true				# 标记本航道已经有数字相加了
 			
 			moveCellAnimate startCell, targetCell
@@ -57,9 +60,13 @@ class Board
 			@topNumberValue = targetCell.value if isSameCell and @topNumberValue < targetCell.value			
 			return true
 		return false
+	
 	updateScore: (updateScoreView) ->
 		# 更新战绩榜
-		
+		if @addscore isnt 0
+			@score += @addScore
+			updateScoreView @score
+		return
 	
 	noBlock: (x1, y1, x2, y2) ->
 		if y1 is y2

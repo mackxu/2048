@@ -6,7 +6,7 @@ class App
 
 		
 		@$numberCellViews = $('.number-cell');			# 获取所有数字块
-
+		@$scoreView = $('#J_score')
 		# 动态生成棋盘格
 		$gridCellViews = $('.grid-cell');
 		for i in [0...4]
@@ -37,24 +37,37 @@ class App
 		@cellSpace = 20
 		@borderRadius = 10
 
+		@cellFontSize = 60
+
 		documentWidth = window.screen.availWidth
 		@$gridGameOver = $('#J_gameover')
+		# 小屏幕的参数
 		if documentWidth < 500 
 			@gridContainerWidth = 0.92 * documentWidth
 			@cellSideLength = 0.2 * documentWidth
 			@cellSpace = 0.04 * documentWidth
 			@borderRadius = 0.02 * documentWidth
+
+			@cellFontSize = 48
 			# 小屏设备, 动态排版
 			@$gridContainer.css({
 				width: @gridContainerWidth
 				height: @gridContainerWidth
 				borderRadius: @borderRadius
 			})
-			# 调整遮罩的行高
-			@$gridGameOver.css lineHeight: @gridContainerWidth 
+			# 调整遮罩的行高和圆角大小
+			@$gridGameOver.css(
+				lineHeight: @gridContainerWidth + 'px'
+				borderRadius: @borderRadius
+			) 
 		return
 
 	updateBoardView: () ->
+		# 刷新战绩榜
+		@board.updateScore((score) =>
+			@$scoreView.text(score)
+			return
+		)
 		@board.updateAllcells( (numberCell) => 
 			{ x, y, value } = numberCell
 			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
@@ -76,6 +89,7 @@ class App
 					width: @cellSideLength
 					height: @cellSideLength
 					lineHeight: @cellSideLength + 'px'
+					fontSize: @cellFontSize
 					top: posY
 					left: posX
 					color: numberCell.getColor()
@@ -111,6 +125,7 @@ class App
 			$(@$numberCellViews[x * 4 + y])
 				.css({
 					lineHeight: @cellSideLength + 'px'
+					fontSize: @cellFontSize
 					color: numberCell.getColor()
 					backgroundColor: numberCell.getBgColor()
 				})
