@@ -2,6 +2,10 @@
 var Board;
 
 Board = (function() {
+  var maxNumber;
+
+  maxNumber = 8192;
+
   function Board(opts) {
     var i, j, _i, _j;
     this.numberCells = [];
@@ -23,7 +27,6 @@ Board = (function() {
     }
     randNumberCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
     randNumberCell.value = Math.random() < 0.9 ? 2 : 4;
-    console.log(this.numberCells);
     if (typeof showNumberAnimate === "function") {
       showNumberAnimate(randNumberCell);
     }
@@ -69,18 +72,6 @@ Board = (function() {
       return true;
     }
     return false;
-  };
-
-  Board.prototype.noSpace = function() {
-    var i, j, _i, _j;
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 0; _j < 4; j = ++_j) {
-        if (this.numberCells[i][j].value === 0) {
-          return false;
-        }
-      }
-    }
-    return true;
   };
 
   Board.prototype.noBlock = function(x1, y1, x2, y2) {
@@ -175,14 +166,6 @@ Board = (function() {
     return false;
   };
 
-  Board.prototype.noMove = function() {
-    if (this.canMoveLeft || this.canMoveRight || this.canMoveUp || this.canMoveDown) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
   Board.prototype.moveLeft = function(moveCellAnimate) {
     var i, j, k, _i, _j, _k;
     if (!this.canMoveLeft()) {
@@ -257,6 +240,20 @@ Board = (function() {
       }
     }
     return true;
+  };
+
+  Board.prototype.gameOver = function(gameOverView) {
+    var cell, _i, _len, _ref;
+    _ref = this.numberCellHelper;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      cell = _ref[_i];
+      if (cell.value === maxNumber) {
+        return gameOverView(true);
+      }
+    }
+    if (!this.canMoveLeft() && !this.canMoveRight() && !this.canMoveUp() && !this.canMoveDown()) {
+      return gameOverView(false);
+    }
   };
 
   return Board;

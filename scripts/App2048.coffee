@@ -1,8 +1,6 @@
 class App
 	constructor: (@$gridContainer) ->
-		@cellSideLength = 100
-		@cellSpace = 20
-		@borderRadius = 10
+		
 		# 准备响应式的面板
 		@createResponeBoard()
 
@@ -24,6 +22,8 @@ class App
 	startGame: () -> 
 		@board = new Board()
 		@isGameOver = false
+		# 玩家gameover时, 隐藏遮罩
+		@$gridGameOver.css display: 'none'
 		
 		@updateBoardView()
 		@showOneNumber()
@@ -31,19 +31,27 @@ class App
 		return
 	
 	createResponeBoard: () ->
-		documentWidth = window.screen.availWidth
-		if documentWidth > 499 
-			documentWidth = 500
-		gridContainerWidth = 0.92 * documentWidth
-		@cellSideLength = 0.2 * documentWidth
-		@cellSpace = 0.04 * documentWidth
-		@borderRadius = 0.02 * documentWidth
+		# 默认视图尺寸
+		@gridContainerWidth = 460
+		@cellSideLength = 100
+		@cellSpace = 20
+		@borderRadius = 10
 
-		@$gridContainer.css({
-			width: gridContainerWidth
-			height: gridContainerWidth
-			borderRadius: @borderRadius
-		})
+		documentWidth = window.screen.availWidth
+		@$gridGameOver = $('#J_gameover')
+		if documentWidth < 500 
+			@gridContainerWidth = 0.92 * documentWidth
+			@cellSideLength = 0.2 * documentWidth
+			@cellSpace = 0.04 * documentWidth
+			@borderRadius = 0.02 * documentWidth
+			# 小屏设备, 动态排版
+			@$gridContainer.css({
+				width: @gridContainerWidth
+				height: @gridContainerWidth
+				borderRadius: @borderRadius
+			})
+			# 调整遮罩的行高
+			@$gridGameOver.css lineHeight: @gridContainerWidth 
 		return
 
 	updateBoardView: () ->
@@ -57,6 +65,7 @@ class App
 				cellNode.css({
 					width: 0
 					height: 0
+					lineHeight: 0
 					top: posY + @cellSideLength / 2
 					left: posX + @cellSideLength / 2
 					color: 'inherit'
@@ -85,11 +94,15 @@ class App
 			# 每次滑动后, 刷新棋盘格并生成新数字块
 			setTimeout( =>
 				@updateBoardView()
-				@showOneNumber()			
-			, 300)	
+				@showOneNumber()			# 拥有50ms的动画
+				return			
+			, 300)
+			setTimeout( =>
+				@gameOver()
+				return			
+			, 380)	
 		return
-			
-	
+				
 	showOneNumber:() ->
 		@board.generateOneNumber( (numberCell) =>
 			# 动画显示一个数字块
@@ -97,6 +110,7 @@ class App
 			
 			$(@$numberCellViews[x * 4 + y])
 				.css({
+					lineHeight: @cellSideLength + 'px'
 					color: numberCell.getColor()
 					backgroundColor: numberCell.getBgColor()
 				})
@@ -126,9 +140,13 @@ class App
 	getPosTop: (i, j) -> 
 		@cellSpace + i * (@cellSpace + @cellSideLength)
 	gameOver: () ->
-		# 如果数据块在四个方向都不能移动了, 本次游戏结束
-		return false if @isGameOver
-		@isGameOver = @board.noMove()
+		# 不管成功或失败, 显示游戏结束时的视图
+		@board.gameOver( (goodWork) =>
+			@$gridGameOver.css( display: 'block' )
+				.text if goodWork then 'You Win!' else 'You Lose!'
+			return
+		)
+		return
 
 # 执行程序
 $ -> 
@@ -139,32 +157,12 @@ $ ->
 		switch e.which
 			when 37
 				appGame.moveCell('moveLeft')
-				setTimeout( -> 
-					appGame.gameOver()
-					return
-				, 300)
-				return
 			when 38
 				appGame.moveCell('moveUp')
-				setTimeout( -> 
-					appGame.gameOver()
-					return
-				, 300)
-				return
 			when 39
 				appGame.moveCell('moveRight')
-				setTimeout( -> 
-					appGame.gameOver()
-					return
-				, 300)
-				return
 			when 40
 				appGame.moveCell('moveDown')
-				setTimeout( -> 
-					appGame.gameOver()
-					return
-				, 300)
-				return
 			else 
 				false	
 	)

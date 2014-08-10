@@ -5,9 +5,6 @@ App = (function() {
   function App($gridContainer) {
     var $gridCellViews, i, j, _i, _j;
     this.$gridContainer = $gridContainer;
-    this.cellSideLength = 100;
-    this.cellSpace = 20;
-    this.borderRadius = 10;
     this.createResponeBoard();
     this.$numberCellViews = $('.number-cell');
     $gridCellViews = $('.grid-cell');
@@ -27,26 +24,36 @@ App = (function() {
   App.prototype.startGame = function() {
     this.board = new Board();
     this.isGameOver = false;
+    this.$gridGameOver.css({
+      display: 'none'
+    });
     this.updateBoardView();
     this.showOneNumber();
     this.showOneNumber();
   };
 
   App.prototype.createResponeBoard = function() {
-    var documentWidth, gridContainerWidth;
+    var documentWidth;
+    this.gridContainerWidth = 460;
+    this.cellSideLength = 100;
+    this.cellSpace = 20;
+    this.borderRadius = 10;
     documentWidth = window.screen.availWidth;
-    if (documentWidth > 499) {
-      documentWidth = 500;
+    this.$gridGameOver = $('#J_gameover');
+    if (documentWidth < 500) {
+      this.gridContainerWidth = 0.92 * documentWidth;
+      this.cellSideLength = 0.2 * documentWidth;
+      this.cellSpace = 0.04 * documentWidth;
+      this.borderRadius = 0.02 * documentWidth;
+      this.$gridContainer.css({
+        width: this.gridContainerWidth,
+        height: this.gridContainerWidth,
+        borderRadius: this.borderRadius
+      });
+      this.$gridGameOver.css({
+        lineHeight: this.gridContainerWidth
+      });
     }
-    gridContainerWidth = 0.92 * documentWidth;
-    this.cellSideLength = 0.2 * documentWidth;
-    this.cellSpace = 0.04 * documentWidth;
-    this.borderRadius = 0.02 * documentWidth;
-    this.$gridContainer.css({
-      width: gridContainerWidth,
-      height: gridContainerWidth,
-      borderRadius: this.borderRadius
-    });
   };
 
   App.prototype.updateBoardView = function() {
@@ -60,6 +67,7 @@ App = (function() {
           cellNode.css({
             width: 0,
             height: 0,
+            lineHeight: 0,
             top: posY + _this.cellSideLength / 2,
             left: posX + _this.cellSideLength / 2,
             color: 'inherit',
@@ -92,9 +100,14 @@ App = (function() {
       setTimeout((function(_this) {
         return function() {
           _this.updateBoardView();
-          return _this.showOneNumber();
+          _this.showOneNumber();
         };
       })(this), 300);
+      setTimeout((function(_this) {
+        return function() {
+          _this.gameOver();
+        };
+      })(this), 380);
     }
   };
 
@@ -104,6 +117,7 @@ App = (function() {
         var value, x, y;
         x = numberCell.x, y = numberCell.y, value = numberCell.value;
         $(_this.$numberCellViews[x * 4 + y]).css({
+          lineHeight: _this.cellSideLength + 'px',
           color: numberCell.getColor(),
           backgroundColor: numberCell.getBgColor()
         }).text(value).animate({
@@ -135,10 +149,13 @@ App = (function() {
   };
 
   App.prototype.gameOver = function() {
-    if (this.isGameOver) {
-      return false;
-    }
-    return this.isGameOver = this.board.noMove();
+    this.board.gameOver((function(_this) {
+      return function(goodWork) {
+        _this.$gridGameOver.css({
+          display: 'block'
+        }).text(goodWork ? 'You Win!' : 'You Lose!');
+      };
+    })(this));
   };
 
   return App;
@@ -153,29 +170,13 @@ $(function() {
     e.preventDefault();
     switch (e.which) {
       case 37:
-        appGame.moveCell('moveLeft');
-        setTimeout(function() {
-          appGame.gameOver();
-        }, 300);
-        break;
+        return appGame.moveCell('moveLeft');
       case 38:
-        appGame.moveCell('moveUp');
-        setTimeout(function() {
-          appGame.gameOver();
-        }, 300);
-        break;
+        return appGame.moveCell('moveUp');
       case 39:
-        appGame.moveCell('moveRight');
-        setTimeout(function() {
-          appGame.gameOver();
-        }, 300);
-        break;
+        return appGame.moveCell('moveRight');
       case 40:
-        appGame.moveCell('moveDown');
-        setTimeout(function() {
-          appGame.gameOver();
-        }, 300);
-        break;
+        return appGame.moveCell('moveDown');
       default:
         return false;
     }

@@ -1,7 +1,8 @@
 class Board
+	maxNumber = 8192
 	constructor: (opts) ->
 		@numberCells = []				# 存放二维数组
-		@numberCellHelper = []			# 动态一维数组, 存放值为0的数据块
+		@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
 		@score = 0
 
 		# 初始化棋盘数字
@@ -15,11 +16,11 @@ class Board
 		
 		# 当数字块排满的时
 		return false if availCellNum is 0
-		# 获取随机位置
+		# 获取随机位置(Math.random() * availCellNum) | 0
 		randNumberCell = @numberCellHelper[(Math.random() * availCellNum) | 0]
 		# 在随机位置上显示随机数字
 		randNumberCell.value = if Math.random() < 0.9 then 2 else 4
-		console.log @numberCells
+		
 		showNumberAnimate? randNumberCell
 		return true
 	
@@ -54,13 +55,6 @@ class Board
 			moveCellAnimate startCell, targetCell
 			return true
 		return false
-
-	noSpace: () ->
-		# 判断是否有空位显示新数字
-		for i in [0...4]
-			for j in [0...4]
-				return false if @numberCells[i][j].value is 0
-		return true
 	
 	noBlock: (x1, y1, x2, y2) ->
 		if y1 is y2
@@ -114,10 +108,6 @@ class Board
 						return true
 		return false
 	
-	noMove: () ->
-		# 不能移动，游戏结束
-		return if @canMoveLeft or @canMoveRight or @canMoveUp or @canMoveDown then false else true
-	
 	moveLeft: (moveCellAnimate) ->	
 		return false unless @canMoveLeft()
 		
@@ -166,6 +156,16 @@ class Board
 						# 寻找下一个值不为0的数字块
 						break if @updateCell i, j, k, j, moveCellAnimate
 		return true
+
+	gameOver: (gameOverView) ->
+		
+		# 数字达到最大时, 赢得比赛。优于棋盘移动判断
+		for cell in @numberCellHelper
+			return gameOverView true if cell.value is maxNumber
+		# 不能移动，比赛失败
+		return gameOverView false if not @canMoveLeft() and not @canMoveRight() and not @canMoveUp() and not @canMoveDown()
+		return
+		
 						
 
 
