@@ -1,23 +1,24 @@
 class App
 	constructor: (@$gridContainer) ->
-		
+	
+		@$gridCells = $('.grid-cell')					# 所有棋盘格集合
+		@$gridGameOver = $('#J_gameover')				# 游戏结束的遮罩
+		@$numberCellViews = $('.number-cell');			# 获取所有数字块
+		@$scoreView = $('#J_score')						# 得分视图
+
+		# 默认视图尺寸
+		@gridContainerWidth = 460
+		@cellSideLength = 100
+		@cellSpace = 20
+		@borderRadius = 10
+
+		@cellFontSize = 60
+
 		# 准备响应式的面板
 		@createResponeBoard()
-
 		
-		@$numberCellViews = $('.number-cell');			# 获取所有数字块
-		@$scoreView = $('#J_score')
-		# 动态生成棋盘格
-		$gridCellViews = $('.grid-cell');
-		for i in [0...4]
-			for j in [0...4]
-				$($gridCellViews[4 * i + j]).css(
-					width: @cellSideLength
-					height: @cellSideLength
-					borderRadius: @borderRadius
-					top: @getPosTop(i, j)
-					left: @getPosLeft(i, j)
-				)
+		# 游戏开始
+		@startGame()
 		
 	startGame: () -> 
 		@board = new Board()
@@ -31,30 +32,37 @@ class App
 		return
 	
 	createResponeBoard: () ->
-		# 默认视图尺寸
-		@gridContainerWidth = 460
-		@cellSideLength = 100
-		@cellSpace = 20
-		@borderRadius = 10
-
-		@cellFontSize = 60
-
 		documentWidth = window.screen.availWidth
-		@$gridGameOver = $('#J_gameover')
-		# 小屏幕的参数
+
+		# 动态生成棋盘格
+		for i in [0...4]
+			for j in [0...4]
+				$(@$gridCells[4 * i + j]).css(
+					
+					top: @getPosTop(i, j)
+					left: @getPosLeft(i, j)
+				)
+
+		# 移动设备的参数, 调整视图
 		if documentWidth < 500 
 			@gridContainerWidth = 0.92 * documentWidth
 			@cellSideLength = 0.2 * documentWidth
 			@cellSpace = 0.04 * documentWidth
 			@borderRadius = 0.02 * documentWidth
 
-			@cellFontSize = 48
-			# 小屏设备, 动态排版
+			@cellFontSize = 40
+			# 棋盘外围框架
 			@$gridContainer.css({
 				width: @gridContainerWidth
 				height: @gridContainerWidth
 				borderRadius: @borderRadius
 			})
+			# 棋盘格
+			@$gridCells.css(
+				width: @cellSideLength
+				height: @cellSideLength
+				borderRadius: @borderRadius
+			)
 			# 调整遮罩的行高和圆角大小
 			@$gridGameOver.css(
 				lineHeight: @gridContainerWidth + 'px'
@@ -78,7 +86,7 @@ class App
 				cellNode.css({
 					width: 0
 					height: 0
-					lineHeight: 0
+					lineHeight: 'normal'
 					top: posY + @cellSideLength / 2
 					left: posX + @cellSideLength / 2
 					color: 'inherit'
@@ -157,7 +165,8 @@ class App
 	gameOver: () ->
 		# 不管成功或失败, 显示游戏结束时的视图
 		@board.gameOver( (goodWork) =>
-			@$gridGameOver.css( display: 'block' )
+			@$gridGameOver
+				.css( display: 'block' )
 				.text if goodWork then 'You Win!' else 'You Lose!'
 			return
 		)
@@ -167,22 +176,49 @@ class App
 $ -> 
 	$gridContainer = $('#grid-container')
 	appGame = new App($gridContainer)
+	startx = starty = endx = endy = 0
 	$(document).on('keydown', (e) ->
-		e.preventDefault()
 		switch e.which
 			when 37
+				e.preventDefault()
 				appGame.moveCell('moveLeft')
 			when 38
+				e.preventDefault()
 				appGame.moveCell('moveUp')
 			when 39
+				e.preventDefault()
 				appGame.moveCell('moveRight')
 			when 40
+				e.preventDefault()
 				appGame.moveCell('moveDown')
 			else 
-				false	
+				false
 	)
-	appGame.startGame()
 
-	$('#newgamebutton').click () ->
+	$gridContainer.on(
+		touchstart: (e) ->
+			#
+			touches = e.originalEvent.targetTouches[0]
+			[startx, starty] = [touches.pageX, touches.pageY]
+
+		touchend: (e) ->
+			#
+			touches = e.originalEvent.changedTouches[0]
+			[endx, endy] = [touches.pageX, touches.pageY]
+
+			# 判断滑动方向, 并执行滑动
+			[deltax, deltay] = [endx - startx, endy - starty]
+			# 过滤不成功的滑动
+			return false if Math.abs(deltax) < 0.3 * appGame.gridContainerWidth and Math.abs(deltay) < 0.3 * appGame.gridContainerWidth
+			if Math.abs(deltax) >= Math.abs(deltay)
+				appGame.moveCell if deltax > 0 then 'moveRight' else 'moveLeft'
+			else
+				appGame.moveCell if deltay > 0 then 'moveDown' else 'moveUp'
+			return
+		touchmove: (e) ->
+			e.preventDefault()
+	)
+
+	$('#J_gamestart').click () ->
 		appGame.startGame()
 	return

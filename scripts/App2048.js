@@ -3,23 +3,18 @@ var App;
 
 App = (function() {
   function App($gridContainer) {
-    var $gridCellViews, i, j, _i, _j;
     this.$gridContainer = $gridContainer;
-    this.createResponeBoard();
+    this.$gridCells = $('.grid-cell');
+    this.$gridGameOver = $('#J_gameover');
     this.$numberCellViews = $('.number-cell');
     this.$scoreView = $('#J_score');
-    $gridCellViews = $('.grid-cell');
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 0; _j < 4; j = ++_j) {
-        $($gridCellViews[4 * i + j]).css({
-          width: this.cellSideLength,
-          height: this.cellSideLength,
-          borderRadius: this.borderRadius,
-          top: this.getPosTop(i, j),
-          left: this.getPosLeft(i, j)
-        });
-      }
-    }
+    this.gridContainerWidth = 460;
+    this.cellSideLength = 100;
+    this.cellSpace = 20;
+    this.borderRadius = 10;
+    this.cellFontSize = 60;
+    this.createResponeBoard();
+    this.startGame();
   }
 
   App.prototype.startGame = function() {
@@ -34,23 +29,30 @@ App = (function() {
   };
 
   App.prototype.createResponeBoard = function() {
-    var documentWidth;
-    this.gridContainerWidth = 460;
-    this.cellSideLength = 100;
-    this.cellSpace = 20;
-    this.borderRadius = 10;
-    this.cellFontSize = 60;
+    var documentWidth, i, j, _i, _j;
     documentWidth = window.screen.availWidth;
-    this.$gridGameOver = $('#J_gameover');
+    for (i = _i = 0; _i < 4; i = ++_i) {
+      for (j = _j = 0; _j < 4; j = ++_j) {
+        $(this.$gridCells[4 * i + j]).css({
+          top: this.getPosTop(i, j),
+          left: this.getPosLeft(i, j)
+        });
+      }
+    }
     if (documentWidth < 500) {
       this.gridContainerWidth = 0.92 * documentWidth;
       this.cellSideLength = 0.2 * documentWidth;
       this.cellSpace = 0.04 * documentWidth;
       this.borderRadius = 0.02 * documentWidth;
-      this.cellFontSize = 48;
+      this.cellFontSize = 40;
       this.$gridContainer.css({
         width: this.gridContainerWidth,
         height: this.gridContainerWidth,
+        borderRadius: this.borderRadius
+      });
+      this.$gridCells.css({
+        width: this.cellSideLength,
+        height: this.cellSideLength,
         borderRadius: this.borderRadius
       });
       this.$gridGameOver.css({
@@ -76,7 +78,7 @@ App = (function() {
           cellNode.css({
             width: 0,
             height: 0,
-            lineHeight: 0,
+            lineHeight: 'normal',
             top: posY + _this.cellSideLength / 2,
             left: posX + _this.cellSideLength / 2,
             color: 'inherit',
@@ -174,26 +176,53 @@ App = (function() {
 })();
 
 $(function() {
-  var $gridContainer, appGame;
+  var $gridContainer, appGame, endx, endy, startx, starty;
   $gridContainer = $('#grid-container');
   appGame = new App($gridContainer);
+  startx = starty = endx = endy = 0;
   $(document).on('keydown', function(e) {
-    e.preventDefault();
     switch (e.which) {
       case 37:
+        e.preventDefault();
         return appGame.moveCell('moveLeft');
       case 38:
+        e.preventDefault();
         return appGame.moveCell('moveUp');
       case 39:
+        e.preventDefault();
         return appGame.moveCell('moveRight');
       case 40:
+        e.preventDefault();
         return appGame.moveCell('moveDown');
       default:
         return false;
     }
   });
-  appGame.startGame();
-  $('#newgamebutton').click(function() {
+  $gridContainer.on({
+    touchstart: function(e) {
+      var touches, _ref;
+      touches = e.originalEvent.targetTouches[0];
+      return _ref = [touches.pageX, touches.pageY], startx = _ref[0], starty = _ref[1], _ref;
+    },
+    touchend: function(e) {
+      var deltax, deltay, touches, _ref, _ref1;
+      touches = e.originalEvent.changedTouches[0];
+      _ref = [touches.pageX, touches.pageY], endx = _ref[0], endy = _ref[1];
+      _ref1 = [endx - startx, endy - starty], deltax = _ref1[0], deltay = _ref1[1];
+      if (Math.abs(deltax) < 0.3 * appGame.gridContainerWidth && Math.abs(deltay) < 0.3 * appGame.gridContainerWidth) {
+        return false;
+      }
+      if (Math.abs(deltax) >= Math.abs(deltay)) {
+        appGame.moveCell(deltax > 0 ? 'moveRight' : 'moveLeft');
+      } else {
+        appGame.moveCell(deltay > 0 ? 'moveDown' : 'moveUp');
+      }
+    },
+    touchmove: function(e) {
+      return e.preventDefault();
+    }
+  });
+  $('#J_gamestart').click(function() {
     return appGame.startGame();
   });
 });
