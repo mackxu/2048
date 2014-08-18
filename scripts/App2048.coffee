@@ -1,10 +1,12 @@
 class App
+	# 获取页面元素, 添加事件监听器
 	constructor: (@$gridContainer) ->
 	
 		@$gridCells = $('.grid-cell')					# 所有棋盘格集合
 		@$gridGameOver = $('#J_gameover')				# 游戏结束的遮罩
 		@$numberCellViews = $('.number-cell');			# 获取所有数字块
-		@$scoreView = $('#J_score')						# 得分视图
+		@$scoreView = $('#J_cur-score')					# 得分视图
+		@$topScore = $('#J_top-score');					# 最高得分, 每次从本地存储中获取
 
 		# 默认视图尺寸
 		@gridContainerWidth = 460
@@ -23,8 +25,11 @@ class App
 	startGame: () -> 
 		@board = new Board()
 		@isGameOver = false
-		# 玩家gameover时, 隐藏遮罩
+		# 玩家开始完时, 隐藏遮罩
 		@$gridGameOver.css display: 'none'
+		# 最高得分记录
+		@topScoreValue = localStorage.getItem('top-score') | 0
+		@$topScore.text(@topScoreValue) if @topScoreValue
 		
 		@updateBoardView()
 		@showOneNumber()
@@ -76,10 +81,11 @@ class App
 			@$scoreView.text(score)
 			return
 		)
+		# 校正数据块视图
 		@board.updateAllcells( (numberCell) => 
 			{ x, y, value } = numberCell
-			cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
-			# cellNode = $(@$numberCellViews[x * 4 + y])
+			# cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
+			cellNode = $(@$numberCellViews[x * 4 + y])
 			[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 			
 			if value is 0
@@ -93,17 +99,42 @@ class App
 					backgroundColor: 'transparent'
 				}).text('')
 			else 
+				# 设置内容有2个汉字的数字块的字体大小 
+				fontSize = if value is 64 or value is 16384 then @cellFontSize * 0.8 else @cellFontSize
 				cellNode.css({
 					width: @cellSideLength
 					height: @cellSideLength
 					lineHeight: @cellSideLength + 'px'
-					fontSize: @cellFontSize
+					fontSize: fontSize
 					top: posY
 					left: posX
 					color: numberCell.getColor()
 					backgroundColor: numberCell.getBgColor() 
-				}).text(value)
+				}).text(numberCell.getText())
 			cellNode.css('display', 'block')
+		)
+		return
+	
+	showOneNumber:() ->
+		@board.generateOneNumber( (numberCell) =>
+			# 动画显示一个数字块
+			{ x, y } = numberCell
+			
+			$(@$numberCellViews[x * 4 + y])
+				.css({
+					lineHeight: @cellSideLength + 'px'
+					fontSize: @cellFontSize
+					color: numberCell.getColor()
+					backgroundColor: numberCell.getBgColor()
+				})
+				.text( numberCell.getText() )
+				.animate({
+					width: @cellSideLength
+					height: @cellSideLength
+					top: @getPosTop(x, y)
+					left: @getPosLeft(x, y)
+				}, 50) 
+			return
 		)
 		return
 	
@@ -125,29 +156,7 @@ class App
 			, 380)	
 		return
 				
-	showOneNumber:() ->
-		@board.generateOneNumber( (numberCell) =>
-			# 动画显示一个数字块
-			{ x, y, value } = numberCell
-			
-			$(@$numberCellViews[x * 4 + y])
-				.css({
-					lineHeight: @cellSideLength + 'px'
-					fontSize: @cellFontSize
-					color: numberCell.getColor()
-					backgroundColor: numberCell.getBgColor()
-				})
-				.text( value )
-				.animate({
-					width: @cellSideLength
-					height: @cellSideLength
-					top: @getPosTop(x, y)
-					left: @getPosLeft(x, y)
-				}, 50) 
-			return
-		)
-		return
-
+	
 	showMoveNumber: (moveCells) ->
 		start = moveCells[0]
 		end = moveCells[1]
@@ -164,7 +173,12 @@ class App
 		@cellSpace + i * (@cellSpace + @cellSideLength)
 	gameOver: () ->
 		# 不管成功或失败, 显示游戏结束时的视图
-		@board.gameOver( (goodWork) =>
+		@board.gameOver( (goodWork, curScoreValue) =>
+			# 记录最高得分到本地
+			if curScoreValue > @topScoreValue
+				localStorage.setItem('top-score', curScoreValue)
+				@$topScore.text curScoreValue
+			# 显示结束界面
 			@$gridGameOver
 				.css( display: 'block' )
 				.text if goodWork then 'You Win!' else 'You Lose!'
@@ -209,7 +223,8 @@ $ ->
 			# 判断滑动方向, 并执行滑动
 			[deltax, deltay] = [endx - startx, endy - starty]
 			# 过滤不成功的滑动
-			return false if Math.abs(deltax) < 0.3 * appGame.gridContainerWidth and Math.abs(deltay) < 0.3 * appGame.gridContainerWidth
+			noMoveWidth = 0.3 * appGame.gridContainerWidth
+			return false if Math.abs(deltax) < noMoveWidth and Math.abs(deltay) < noMoveWidth
 			if Math.abs(deltax) >= Math.abs(deltay)
 				appGame.moveCell if deltax > 0 then 'moveRight' else 'moveLeft'
 			else

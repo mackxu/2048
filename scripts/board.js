@@ -4,7 +4,7 @@ var Board;
 Board = (function() {
   var maxNumber;
 
-  maxNumber = 8192;
+  maxNumber = 32768;
 
   function Board() {
     var i, j, _i, _j;
@@ -257,10 +257,10 @@ Board = (function() {
 
   Board.prototype.gameOver = function(gameOverView) {
     if (this.topNumberValue === maxNumber) {
-      return gameOverView(true);
+      return gameOverView(true, this.score);
     }
     if (!this.canMoveLeft() && !this.canMoveRight() && !this.canMoveUp() && !this.canMoveDown()) {
-      return gameOverView(false);
+      return gameOverView(false, this.score);
     }
   };
 

@@ -1,12 +1,12 @@
 class Board
-	maxNumber = 8192
+	maxNumber = 32768
 	constructor: () ->
 		@numberCells = []				# 存放二维数组
 		@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
 		@topNumberValue = 0				# 记录数据块最大值
 		
-		@score = 0
-		@addScore = 0
+		@score = 0						# 总分数
+		@addScore = 0					# 存储一次滑动得到的分数
 
 		# 初始化棋盘数字
 		for i in [0...4]
@@ -172,9 +172,9 @@ class Board
 	gameOver: (gameOverView) ->
 		
 		# 数字达到最大时, 赢得比赛。优于棋盘移动判断
-		return gameOverView true if @topNumberValue is maxNumber
+		return gameOverView true, @score if @topNumberValue is maxNumber
 		# 不能移动，比赛失败
-		return gameOverView false if not @canMoveLeft() and not @canMoveRight() and not @canMoveUp() and not @canMoveDown()
+		return gameOverView false, @score if not @canMoveLeft() and not @canMoveRight() and not @canMoveUp() and not @canMoveDown()
 		return
 		
 						

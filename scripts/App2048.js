@@ -7,7 +7,8 @@ App = (function() {
     this.$gridCells = $('.grid-cell');
     this.$gridGameOver = $('#J_gameover');
     this.$numberCellViews = $('.number-cell');
-    this.$scoreView = $('#J_score');
+    this.$scoreView = $('#J_cur-score');
+    this.$topScore = $('#J_top-score');
     this.gridContainerWidth = 460;
     this.cellSideLength = 100;
     this.cellSpace = 20;
@@ -23,6 +24,10 @@ App = (function() {
     this.$gridGameOver.css({
       display: 'none'
     });
+    this.topScoreValue = localStorage.getItem('top-score') | 0;
+    if (this.topScoreValue) {
+      this.$topScore.text(this.topScoreValue);
+    }
     this.updateBoardView();
     this.showOneNumber();
     this.showOneNumber();
@@ -70,9 +75,9 @@ App = (function() {
     })(this));
     this.board.updateAllcells((function(_this) {
       return function(numberCell) {
-        var cellNode, posX, posY, value, x, y, _ref;
+        var cellNode, fontSize, posX, posY, value, x, y, _ref;
         x = numberCell.x, y = numberCell.y, value = numberCell.value;
-        cellNode = $("#number-cell-" + x + "-" + y).css('display', 'none');
+        cellNode = $(_this.$numberCellViews[x * 4 + y]);
         _ref = [_this.getPosLeft(x, y), _this.getPosTop(x, y)], posX = _ref[0], posY = _ref[1];
         if (value === 0) {
           cellNode.css({
@@ -85,18 +90,39 @@ App = (function() {
             backgroundColor: 'transparent'
           }).text('');
         } else {
+          fontSize = value === 64 || value === 16384 ? _this.cellFontSize * 0.8 : _this.cellFontSize;
           cellNode.css({
             width: _this.cellSideLength,
             height: _this.cellSideLength,
             lineHeight: _this.cellSideLength + 'px',
-            fontSize: _this.cellFontSize,
+            fontSize: fontSize,
             top: posY,
             left: posX,
             color: numberCell.getColor(),
             backgroundColor: numberCell.getBgColor()
-          }).text(value);
+          }).text(numberCell.getText());
         }
         return cellNode.css('display', 'block');
+      };
+    })(this));
+  };
+
+  App.prototype.showOneNumber = function() {
+    this.board.generateOneNumber((function(_this) {
+      return function(numberCell) {
+        var x, y;
+        x = numberCell.x, y = numberCell.y;
+        $(_this.$numberCellViews[x * 4 + y]).css({
+          lineHeight: _this.cellSideLength + 'px',
+          fontSize: _this.cellFontSize,
+          color: numberCell.getColor(),
+          backgroundColor: numberCell.getBgColor()
+        }).text(numberCell.getText()).animate({
+          width: _this.cellSideLength,
+          height: _this.cellSideLength,
+          top: _this.getPosTop(x, y),
+          left: _this.getPosLeft(x, y)
+        }, 50);
       };
     })(this));
   };
@@ -123,26 +149,6 @@ App = (function() {
     }
   };
 
-  App.prototype.showOneNumber = function() {
-    this.board.generateOneNumber((function(_this) {
-      return function(numberCell) {
-        var value, x, y;
-        x = numberCell.x, y = numberCell.y, value = numberCell.value;
-        $(_this.$numberCellViews[x * 4 + y]).css({
-          lineHeight: _this.cellSideLength + 'px',
-          fontSize: _this.cellFontSize,
-          color: numberCell.getColor(),
-          backgroundColor: numberCell.getBgColor()
-        }).text(value).animate({
-          width: _this.cellSideLength,
-          height: _this.cellSideLength,
-          top: _this.getPosTop(x, y),
-          left: _this.getPosLeft(x, y)
-        }, 50);
-      };
-    })(this));
-  };
-
   App.prototype.showMoveNumber = function(moveCells) {
     var end, start;
     start = moveCells[0];
@@ -163,7 +169,11 @@ App = (function() {
 
   App.prototype.gameOver = function() {
     this.board.gameOver((function(_this) {
-      return function(goodWork) {
+      return function(goodWork, curScoreValue) {
+        if (curScoreValue > _this.topScoreValue) {
+          localStorage.setItem('top-score', curScoreValue);
+          _this.$topScore.text(curScoreValue);
+        }
         _this.$gridGameOver.css({
           display: 'block'
         }).text(goodWork ? 'You Win!' : 'You Lose!');
@@ -205,11 +215,12 @@ $(function() {
       return _ref = [touches.pageX, touches.pageY], startx = _ref[0], starty = _ref[1], _ref;
     },
     touchend: function(e) {
-      var deltax, deltay, touches, _ref, _ref1;
+      var deltax, deltay, noMoveWidth, touches, _ref, _ref1;
       touches = e.originalEvent.changedTouches[0];
       _ref = [touches.pageX, touches.pageY], endx = _ref[0], endy = _ref[1];
       _ref1 = [endx - startx, endy - starty], deltax = _ref1[0], deltay = _ref1[1];
-      if (Math.abs(deltax) < 0.3 * appGame.gridContainerWidth && Math.abs(deltay) < 0.3 * appGame.gridContainerWidth) {
+      noMoveWidth = 0.3 * appGame.gridContainerWidth;
+      if (Math.abs(deltax) < noMoveWidth && Math.abs(deltay) < noMoveWidth) {
         return false;
       }
       if (Math.abs(deltax) >= Math.abs(deltay)) {

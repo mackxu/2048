@@ -5,6 +5,7 @@ class Number
 	getColor: () ->
 		if @value <= 4 then '#776e65' else '#fff';
 	
+	# 根据数值，返回背景色
 	getBgColor: () ->
 		switch @value
 			when 0 then 'transparent'
@@ -21,4 +22,30 @@ class Number
 			when 2048 then '#09c'
 			when 4096 then '#a6c'
 			when 8192 then '#93c'
-			else '#000'
+			when 16384 then '#2E4E7E'
+			when 32768 then '#FF2121'
+
+	# 根据数据值返回文本
+	getText: () ->
+		switch @value
+			when 2 then '夏'
+			when 4 then '商'
+			when 8 then '周'
+			when 16 then '秦'
+			when 32 then '汉'
+			when 64 then '三国'
+			when 128 then '晋'
+			when 256 then '隋'
+			when 512 then '唐'
+			when 1024 then '宋'
+			when 2048 then '元'
+			when 4096 then '明'
+			when 8192 then '清'
+			when 16384 then '民国'
+			when 32768 then 'PRC'
+	getFontSize: () ->
+		if @value is 64 or @value is 16384 then 49 else 60
+			
+		
+			
+		

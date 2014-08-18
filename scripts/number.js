@@ -47,8 +47,53 @@ Number = (function() {
         return '#a6c';
       case 8192:
         return '#93c';
-      default:
-        return '#000';
+      case 16384:
+        return '#2E4E7E';
+      case 32768:
+        return '#FF2121';
+    }
+  };
+
+  Number.prototype.getText = function() {
+    switch (this.value) {
+      case 2:
+        return '夏';
+      case 4:
+        return '商';
+      case 8:
+        return '周';
+      case 16:
+        return '秦';
+      case 32:
+        return '汉';
+      case 64:
+        return '三国';
+      case 128:
+        return '晋';
+      case 256:
+        return '隋';
+      case 512:
+        return '唐';
+      case 1024:
+        return '宋';
+      case 2048:
+        return '元';
+      case 4096:
+        return '明';
+      case 8192:
+        return '清';
+      case 16384:
+        return '民国';
+      case 32768:
+        return 'PRC';
+    }
+  };
+
+  Number.prototype.getFontSize = function() {
+    if (this.value === 64 || this.value === 16384) {
+      return 49;
+    } else {
+      return 60;
     }
   };
 
