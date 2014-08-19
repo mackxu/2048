@@ -2,6 +2,10 @@
 var App;
 
 App = (function() {
+  var localCurScore, localNumbercells, localTopScore, _ref;
+
+  _ref = ['numberCells2', 'top-score', 'cur-score'], localNumbercells = _ref[0], localTopScore = _ref[1], localCurScore = _ref[2];
+
   function App($gridContainer) {
     this.$gridContainer = $gridContainer;
     this.$gridCells = $('.grid-cell');
@@ -15,22 +19,35 @@ App = (function() {
     this.borderRadius = 10;
     this.cellFontSize = 60;
     this.createResponeBoard();
-    this.startGame();
+    $('#J_gamestart').on('startGame', (function(_this) {
+      return function(event, clicked) {
+        _this.startGame(clicked);
+      };
+    })(this)).on('click', function() {
+      $(this).trigger('startGame', [true]);
+    }).trigger('startGame');
   }
 
-  App.prototype.startGame = function() {
-    this.board = new Board();
+  App.prototype.startGame = function(clicked) {
+    var history;
     this.isGameOver = false;
     this.$gridGameOver.css({
       display: 'none'
     });
-    this.topScoreValue = localStorage.getItem('top-score') | 0;
-    if (this.topScoreValue) {
+    this.topScoreValue = localStorage.getItem(localTopScore) | 0;
+    if (this.topScoreValue !== 0) {
       this.$topScore.text(this.topScoreValue);
     }
-    this.updateBoardView();
-    this.showOneNumber();
-    this.showOneNumber();
+    history = JSON.parse(localStorage.getItem(localNumbercells));
+    if (clicked === true || history === null) {
+      this.board = new Board();
+      this.updateBoardView();
+      this.showOneNumber();
+      this.showOneNumber();
+    } else {
+      this.board = new Board(history);
+      this.updateBoardView();
+    }
   };
 
   App.prototype.createResponeBoard = function() {
@@ -75,10 +92,10 @@ App = (function() {
     })(this));
     this.board.updateAllcells((function(_this) {
       return function(numberCell) {
-        var cellNode, fontSize, posX, posY, value, x, y, _ref;
+        var cellNode, fontSize, posX, posY, value, x, y, _ref1;
         x = numberCell.x, y = numberCell.y, value = numberCell.value;
-        cellNode = $(_this.$numberCellViews[x * 4 + y]);
-        _ref = [_this.getPosLeft(x, y), _this.getPosTop(x, y)], posX = _ref[0], posY = _ref[1];
+        cellNode = $(_this.$numberCellViews[x * 4 + y]).css('display', 'none');
+        _ref1 = [_this.getPosLeft(x, y), _this.getPosTop(x, y)], posX = _ref1[0], posY = _ref1[1];
         if (value === 0) {
           cellNode.css({
             width: 0,
@@ -109,7 +126,7 @@ App = (function() {
 
   App.prototype.showOneNumber = function() {
     this.board.generateOneNumber((function(_this) {
-      return function(numberCell) {
+      return function(numberCell, numberCells, curScore) {
         var x, y;
         x = numberCell.x, y = numberCell.y;
         $(_this.$numberCellViews[x * 4 + y]).css({
@@ -123,6 +140,10 @@ App = (function() {
           top: _this.getPosTop(x, y),
           left: _this.getPosLeft(x, y)
         }, 50);
+        localStorage.setItem(localNumbercells, JSON.stringify({
+          numberCells: numberCells,
+          curScore: curScore
+        }));
       };
     })(this));
   };
@@ -208,7 +229,7 @@ $(function() {
         return false;
     }
   });
-  $gridContainer.on({
+  return $gridContainer.on({
     touchstart: function(e) {
       var touches, _ref;
       touches = e.originalEvent.targetTouches[0];
@@ -232,8 +253,5 @@ $(function() {
     touchmove: function(e) {
       return e.preventDefault();
     }
-  });
-  $('#J_gamestart').click(function() {
-    return appGame.startGame();
   });
 });

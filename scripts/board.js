@@ -6,17 +6,30 @@ Board = (function() {
 
   maxNumber = 32768;
 
-  function Board() {
-    var i, j, _i, _j;
+  function Board(localData) {
+    var cell, i, j, rowCells, _i, _j, _k, _l, _len, _len1, _ref;
     this.numberCells = [];
     this.numberCellHelper = [];
     this.topNumberValue = 0;
     this.score = 0;
     this.addScore = 0;
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      this.numberCells[i] = [];
-      for (j = _j = 0; _j < 4; j = ++_j) {
-        this.numberCells[i][j] = new Number(0, i, j);
+    if (localData) {
+      this.score = localData.curScore;
+      _ref = localData.numberCells;
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        rowCells = _ref[i];
+        this.numberCells[i] = [];
+        for (j = _j = 0, _len1 = rowCells.length; _j < _len1; j = ++_j) {
+          cell = rowCells[j];
+          this.numberCells[i][j] = new Number(cell.value, i, j);
+        }
+      }
+    } else {
+      for (i = _k = 0; _k < 4; i = ++_k) {
+        this.numberCells[i] = [];
+        for (j = _l = 0; _l < 4; j = ++_l) {
+          this.numberCells[i][j] = new Number(0, i, j);
+        }
       }
     }
   }
@@ -30,7 +43,7 @@ Board = (function() {
     randNumberCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
     randNumberCell.value = Math.random() < 0.9 ? 2 : 4;
     if (typeof showNumberAnimate === "function") {
-      showNumberAnimate(randNumberCell);
+      showNumberAnimate(randNumberCell, this.numberCells, this.score);
     }
     return true;
   };

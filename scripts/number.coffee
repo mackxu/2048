@@ -45,6 +45,9 @@ class Number
 			when 32768 then 'PRC'
 	getFontSize: () ->
 		if @value is 64 or @value is 16384 then 49 else 60
+	# 当对象需要转换为字符串时, 调用该方法
+	toString: () ->
+		@value
 			
 		
 			

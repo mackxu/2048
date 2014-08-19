@@ -1,4 +1,6 @@
 class App
+	# 私有变量
+	[localNumbercells, localTopScore, localCurScore] = ['numberCells2', 'top-score', 'cur-score']
 	# 获取页面元素, 添加事件监听器
 	constructor: (@$gridContainer) ->
 	
@@ -18,22 +20,40 @@ class App
 
 		# 准备响应式的面板
 		@createResponeBoard()
+
+
+		# 添加事件监听器
+		$('#J_gamestart')
+			.on('startGame', ( event, clicked ) =>
+				@startGame clicked
+				return
+			)
+			.on('click', ->
+				$(this).trigger 'startGame', [ true ]
+				return
+			).trigger 'startGame'					# 页面加载时, 游戏开始
 		
-		# 游戏开始
-		@startGame()
+	startGame: ( clicked ) -> 
 		
-	startGame: () -> 
-		@board = new Board()
 		@isGameOver = false
 		# 玩家开始完时, 隐藏遮罩
 		@$gridGameOver.css display: 'none'
-		# 最高得分记录
-		@topScoreValue = localStorage.getItem('top-score') | 0
-		@$topScore.text(@topScoreValue) if @topScoreValue
 		
-		@updateBoardView()
-		@showOneNumber()
-		@showOneNumber()
+		# 如果存在本地存储的最高得分记录, 就显示出来
+		@topScoreValue = localStorage.getItem(localTopScore) | 0
+		@$topScore.text @topScoreValue if @topScoreValue isnt 0
+		
+		# 获取游戏存档
+		history = JSON.parse localStorage.getItem localNumbercells
+		# 判断是否是新开始的游戏
+		if clicked is true or history is null 
+			@board = new Board()
+			@updateBoardView()
+			@showOneNumber()
+			@showOneNumber()
+		else 
+			@board = new Board( history )
+			@updateBoardView()
 		return
 	
 	createResponeBoard: () ->
@@ -69,7 +89,6 @@ class App
 		for i in [0...4]
 			for j in [0...4]
 				$(@$gridCells[4 * i + j]).css(
-					
 					top: @getPosTop(i, j)
 					left: @getPosLeft(i, j)
 				)
@@ -85,8 +104,7 @@ class App
 		# 校正数据块视图
 		@board.updateAllcells( (numberCell) => 
 			{ x, y, value } = numberCell
-			# cellNode = $("#number-cell-#{x}-#{y}").css('display', 'none')
-			cellNode = $(@$numberCellViews[x * 4 + y])
+			cellNode = $(@$numberCellViews[x * 4 + y]).css('display', 'none')
 			[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 			
 			if value is 0
@@ -117,10 +135,9 @@ class App
 		return
 	
 	showOneNumber:() ->
-		@board.generateOneNumber( (numberCell) =>
+		@board.generateOneNumber( (numberCell, numberCells, curScore) =>
 			# 动画显示一个数字块
 			{ x, y } = numberCell
-			
 			$(@$numberCellViews[x * 4 + y])
 				.css({
 					lineHeight: @cellSideLength + 'px'
@@ -134,7 +151,9 @@ class App
 					height: @cellSideLength
 					top: @getPosTop(x, y)
 					left: @getPosLeft(x, y)
-				}, 50) 
+				}, 50)
+			# 本地定时存储当前进度和当前得分 numberCells、curScore
+			localStorage.setItem localNumbercells, JSON.stringify numberCells: numberCells, curScore: curScore 
 			return
 		)
 		return
@@ -234,7 +253,3 @@ $ ->
 		touchmove: (e) ->
 			e.preventDefault()
 	)
-
-	$('#J_gamestart').click () ->
-		appGame.startGame()
-	return

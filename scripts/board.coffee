@@ -1,18 +1,25 @@
 class Board
 	maxNumber = 32768
-	constructor: () ->
+	constructor: (localData) ->
 		@numberCells = []				# 存放二维数组
 		@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
 		@topNumberValue = 0				# 记录数据块最大值
 		
 		@score = 0						# 总分数
 		@addScore = 0					# 存储一次滑动得到的分数
-
+		
 		# 初始化棋盘数字
-		for i in [0...4]
-			@numberCells[i] = []
-			for j in [0...4]
-				@numberCells[i][j] = new Number(0, i, j)
+		if localData
+			@score = localData.curScore	# 本地的分数
+			for rowCells, i in localData.numberCells
+				@numberCells[i] = []
+				for cell, j in rowCells
+					@numberCells[i][j] = new Number cell.value, i, j
+		else
+			for i in [0...4]
+				@numberCells[i] = []
+				for j in [0...4]
+					@numberCells[i][j] = new Number 0, i, j 
 
 	generateOneNumber: (showNumberAnimate) ->
 		availCellNum = @numberCellHelper.length
@@ -24,7 +31,7 @@ class Board
 		# 在随机位置上显示随机数字
 		randNumberCell.value = if Math.random() < 0.9 then 2 else 4
 		
-		showNumberAnimate? randNumberCell
+		showNumberAnimate? randNumberCell, @numberCells, @score
 		return true
 	
 	# 把每个数据在数据块内显示

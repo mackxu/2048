@@ -97,6 +97,10 @@ Number = (function() {
     }
   };
 
+  Number.prototype.toString = function() {
+    return this.value;
+  };
+
   return Number;
 
 })();
