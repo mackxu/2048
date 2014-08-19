@@ -5,9 +5,19 @@ header a { display: inline-block; padding: 10px; border-radius: 10px; background
 header a:hover { background-color:#9f8b77; }
 
 #grid-container { width: 460px; height: 460px; padding: 20px; margin: 10px auto; background-color:#bbada0; border-radius: 10px; position: relative;}
-.grid-gameover { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: rgba(255, 0, 0, 0.4); border-radius: 10px; text-align: center; line-height: 460px; font-size: 64px; color: #fff; display: none; }
-.grid-cell{ width:100px; height:100px; border-radius: 6px; background-color:#ccc0b3; position: absolute; }
-.number-cell{
+.grid-gameover { 
+    display: none;
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0; 
+    background-color: rgba(255, 0, 0, 0.4); 
+    border-radius: 10px; text-align: center; line-height: 460px; font-size: 64px; color: #fff;
+    -moz-user-select: none;         /* 火狐 */
+    -webkit-user-select: none;      /* webkit浏览器 */
+    -ms-user-select: none;          /* IE10 */
+    -khtml-user-select: none;       /* 早期浏览器 */
+    user-select: none; 
+}
+.grid-cell { width:100px; height:100px; border-radius: 6px; background-color:#ccc0b3; position: absolute; }
+.number-cell {
     border-radius: 6px;
 
     font-weight: bold;

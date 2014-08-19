@@ -39,15 +39,6 @@ class App
 	createResponeBoard: () ->
 		documentWidth = window.screen.availWidth
 
-		# 动态生成棋盘格
-		for i in [0...4]
-			for j in [0...4]
-				$(@$gridCells[4 * i + j]).css(
-					
-					top: @getPosTop(i, j)
-					left: @getPosLeft(i, j)
-				)
-
 		# 移动设备的参数, 调整视图
 		if documentWidth < 500 
 			@gridContainerWidth = 0.92 * documentWidth
@@ -72,7 +63,17 @@ class App
 			@$gridGameOver.css(
 				lineHeight: @gridContainerWidth + 'px'
 				borderRadius: @borderRadius
-			) 
+			)
+
+		# 动态生成棋盘格
+		for i in [0...4]
+			for j in [0...4]
+				$(@$gridCells[4 * i + j]).css(
+					
+					top: @getPosTop(i, j)
+					left: @getPosLeft(i, j)
+				)
+
 		return
 
 	updateBoardView: () ->

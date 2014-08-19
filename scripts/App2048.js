@@ -36,14 +36,6 @@ App = (function() {
   App.prototype.createResponeBoard = function() {
     var documentWidth, i, j, _i, _j;
     documentWidth = window.screen.availWidth;
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 0; _j < 4; j = ++_j) {
-        $(this.$gridCells[4 * i + j]).css({
-          top: this.getPosTop(i, j),
-          left: this.getPosLeft(i, j)
-        });
-      }
-    }
     if (documentWidth < 500) {
       this.gridContainerWidth = 0.92 * documentWidth;
       this.cellSideLength = 0.2 * documentWidth;
@@ -64,6 +56,14 @@ App = (function() {
         lineHeight: this.gridContainerWidth + 'px',
         borderRadius: this.borderRadius
       });
+    }
+    for (i = _i = 0; _i < 4; i = ++_i) {
+      for (j = _j = 0; _j < 4; j = ++_j) {
+        $(this.$gridCells[4 * i + j]).css({
+          top: this.getPosTop(i, j),
+          left: this.getPosLeft(i, j)
+        });
+      }
     }
   };
 
