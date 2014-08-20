@@ -2,9 +2,11 @@
 var App;
 
 App = (function() {
-  var localCurScore, localNumbercells, localTopScore, _ref;
+  var localCurScore, localNumbercells, localTimer, localTopScore, _ref;
 
   _ref = ['numberCells2', 'top-score', 'cur-score'], localNumbercells = _ref[0], localTopScore = _ref[1], localCurScore = _ref[2];
+
+  localTimer = null;
 
   function App($gridContainer) {
     this.$gridContainer = $gridContainer;
@@ -140,10 +142,13 @@ App = (function() {
           top: _this.getPosTop(x, y),
           left: _this.getPosLeft(x, y)
         }, 50);
-        localStorage.setItem(localNumbercells, JSON.stringify({
-          numberCells: numberCells,
-          curScore: curScore
-        }));
+        clearTimeout(localTimer);
+        localTimer = setTimeout(function() {
+          return localStorage.setItem(localNumbercells, JSON.stringify({
+            numberCells: numberCells,
+            curScore: curScore
+          }));
+        }, 1000);
       };
     })(this));
   };

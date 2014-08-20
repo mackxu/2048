@@ -1,6 +1,7 @@
 class App
 	# 私有变量
 	[localNumbercells, localTopScore, localCurScore] = ['numberCells2', 'top-score', 'cur-score']
+	localTimer = null 			# 本地存储游戏进度的定时器
 	# 获取页面元素, 添加事件监听器
 	constructor: (@$gridContainer) ->
 	
@@ -153,7 +154,10 @@ class App
 					left: @getPosLeft(x, y)
 				}, 50)
 			# 本地定时存储当前进度和当前得分 numberCells、curScore
-			localStorage.setItem localNumbercells, JSON.stringify numberCells: numberCells, curScore: curScore 
+			clearTimeout localTimer					# 清除还没执行的定时器, localTimer是私有属性
+			localTimer = setTimeout( =>
+				localStorage.setItem localNumbercells, JSON.stringify numberCells: numberCells, curScore: curScore
+			, 1000)
 			return
 		)
 		return
