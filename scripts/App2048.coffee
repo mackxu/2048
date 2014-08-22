@@ -136,7 +136,7 @@ class App
 		return
 	
 	showOneNumber:() ->
-		@board.generateOneNumber( (numberCell, numberCells, curScore) =>
+		@board.generateOneNumber( (numberCell, progress) =>
 			# 动画显示一个数字块
 			{ x, y } = numberCell
 			$(@$numberCellViews[x * 4 + y])
@@ -156,7 +156,7 @@ class App
 			# 本地定时存储当前进度和当前得分 numberCells、curScore
 			clearTimeout localTimer					# 清除还没执行的定时器, localTimer是私有属性
 			localTimer = setTimeout( =>
-				localStorage.setItem localNumbercells, JSON.stringify numberCells: numberCells, curScore: curScore
+				localStorage.setItem localNumbercells, JSON.stringify progress
 			, 1000)
 			return
 		)

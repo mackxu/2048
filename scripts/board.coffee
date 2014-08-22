@@ -31,7 +31,8 @@ class Board
 		# 在随机位置上显示随机数字
 		randNumberCell.value = if Math.random() < 0.9 then 2 else 4
 		
-		showNumberAnimate? randNumberCell, @numberCells, @score
+		# 传递随机数字块和游戏进度(数字分布和当前得分)
+		showNumberAnimate? randNumberCell, numberCells: @numberCells, curScore: @score
 		return true
 	
 	# 把每个数据在数据块内显示

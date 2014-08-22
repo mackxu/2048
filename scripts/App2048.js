@@ -128,7 +128,7 @@ App = (function() {
 
   App.prototype.showOneNumber = function() {
     this.board.generateOneNumber((function(_this) {
-      return function(numberCell, numberCells, curScore) {
+      return function(numberCell, progress) {
         var x, y;
         x = numberCell.x, y = numberCell.y;
         $(_this.$numberCellViews[x * 4 + y]).css({
@@ -144,10 +144,7 @@ App = (function() {
         }, 50);
         clearTimeout(localTimer);
         localTimer = setTimeout(function() {
-          return localStorage.setItem(localNumbercells, JSON.stringify({
-            numberCells: numberCells,
-            curScore: curScore
-          }));
+          return localStorage.setItem(localNumbercells, JSON.stringify(progress));
         }, 1000);
       };
     })(this));

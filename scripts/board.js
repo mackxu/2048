@@ -43,7 +43,10 @@ Board = (function() {
     randNumberCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
     randNumberCell.value = Math.random() < 0.9 ? 2 : 4;
     if (typeof showNumberAnimate === "function") {
-      showNumberAnimate(randNumberCell, this.numberCells, this.score);
+      showNumberAnimate(randNumberCell, {
+        numberCells: this.numberCells,
+        curScore: this.score
+      });
     }
     return true;
   };
