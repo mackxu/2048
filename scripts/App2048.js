@@ -2,9 +2,9 @@
 var App;
 
 App = (function() {
-  var localCurScore, localNumbercells, localTimer, localTopScore, _ref;
+  var gameProgress, localCurScore, localTimer, localTopScore, _ref;
 
-  _ref = ['numberCells2', 'top-score', 'cur-score'], localNumbercells = _ref[0], localTopScore = _ref[1], localCurScore = _ref[2];
+  _ref = ['gameProgress', 'top-score', 'cur-score'], gameProgress = _ref[0], localTopScore = _ref[1], localCurScore = _ref[2];
 
   localTimer = null;
 
@@ -40,8 +40,8 @@ App = (function() {
     if (this.topScoreValue !== 0) {
       this.$topScore.text(this.topScoreValue);
     }
-    history = JSON.parse(localStorage.getItem(localNumbercells));
-    if (clicked === true || history === null) {
+    history = JSON.parse(localStorage.getItem(gameProgress));
+    if (clicked === true || history === null || +localStorage.getItem('isGameOver') === 1) {
       this.board = new Board();
       this.updateBoardView();
       this.showOneNumber();
@@ -50,6 +50,7 @@ App = (function() {
       this.board = new Board(history);
       this.updateBoardView();
     }
+    localStorage.setItem('isGameOver', 0);
   };
 
   App.prototype.createResponeBoard = function() {
@@ -144,7 +145,7 @@ App = (function() {
         }, 50);
         clearTimeout(localTimer);
         localTimer = setTimeout(function() {
-          return localStorage.setItem(localNumbercells, JSON.stringify(progress));
+          return localStorage.setItem(gameProgress, JSON.stringify(progress));
         }, 1000);
       };
     })(this));
@@ -200,6 +201,7 @@ App = (function() {
         _this.$gridGameOver.css({
           display: 'block'
         }).text(goodWork ? 'You Win!' : 'You Lose!');
+        localStorage.setItem('isGameOver', 1);
       };
     })(this));
   };

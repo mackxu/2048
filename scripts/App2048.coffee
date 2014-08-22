@@ -1,7 +1,9 @@
 class App
 	# 私有变量
-	[localNumbercells, localTopScore, localCurScore] = ['numberCells2', 'top-score', 'cur-score']
+	[gameProgress, localTopScore, localCurScore] = ['gameProgress', 'top-score', 'cur-score']
 	localTimer = null 			# 本地存储游戏进度的定时器
+
+
 	# 获取页面元素, 添加事件监听器
 	constructor: (@$gridContainer) ->
 	
@@ -45,9 +47,9 @@ class App
 		@$topScore.text @topScoreValue if @topScoreValue isnt 0
 		
 		# 获取游戏存档
-		history = JSON.parse localStorage.getItem localNumbercells
+		history = JSON.parse localStorage.getItem gameProgress
 		# 判断是否是新开始的游戏
-		if clicked is true or history is null 
+		if clicked is true or history is null or +localStorage.getItem('isGameOver') is 1
 			@board = new Board()
 			@updateBoardView()
 			@showOneNumber()
@@ -55,6 +57,10 @@ class App
 		else 
 			@board = new Board( history )
 			@updateBoardView()
+
+		# 解决由于本地存储带来的当用户重新打开游戏结束界面时没有提示游戏结束的信息问题
+		# 每次游戏开始, 标识游戏在进行0, 游戏失败为1
+		localStorage.setItem 'isGameOver', 0 
 		return
 	
 	createResponeBoard: () ->
@@ -136,6 +142,8 @@ class App
 		return
 	
 	showOneNumber:() ->
+		# numberCell 要显示的数字块
+		# progress 将要存储到本地的游戏进度
 		@board.generateOneNumber( (numberCell, progress) =>
 			# 动画显示一个数字块
 			{ x, y } = numberCell
@@ -156,7 +164,7 @@ class App
 			# 本地定时存储当前进度和当前得分 numberCells、curScore
 			clearTimeout localTimer					# 清除还没执行的定时器, localTimer是私有属性
 			localTimer = setTimeout( =>
-				localStorage.setItem localNumbercells, JSON.stringify progress
+				localStorage.setItem gameProgress, JSON.stringify progress
 			, 1000)
 			return
 		)
@@ -206,6 +214,7 @@ class App
 			@$gridGameOver
 				.css( display: 'block' )
 				.text if goodWork then 'You Win!' else 'You Lose!'
+			localStorage.setItem 'isGameOver', 1
 			return
 		)
 		return
