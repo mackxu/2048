@@ -14,7 +14,7 @@ class App
 		@$topScore = $('#J_top-score');					# 最高得分, 每次从本地存储中获取
 
 		# 默认视图尺寸
-		@gridContainerWidth = 460
+		@gridContainerWidth = 500
 		@cellSideLength = 100
 		@cellSpace = 20
 		@borderRadius = 10
@@ -34,7 +34,7 @@ class App
 			.on('click', ->
 				$(this).trigger 'startGame', [ true ]
 				return
-			).trigger 'startGame'					# 页面加载时, 游戏开始
+			).trigger 'startGame'						# 页面加载时, 游戏开始
 		
 	startGame: ( clicked ) -> 
 		
@@ -68,7 +68,7 @@ class App
 
 		# 移动设备的参数, 调整视图
 		if documentWidth < 500 
-			@gridContainerWidth = 0.92 * documentWidth
+			@gridContainerWidth = documentWidth
 			@cellSideLength = 0.2 * documentWidth
 			@cellSpace = 0.04 * documentWidth
 			@borderRadius = 0.02 * documentWidth
@@ -78,7 +78,6 @@ class App
 			@$gridContainer.css({
 				width: @gridContainerWidth
 				height: @gridContainerWidth
-				borderRadius: @borderRadius
 			})
 			# 棋盘格
 			@$gridCells.css(
@@ -125,8 +124,8 @@ class App
 					backgroundColor: 'transparent'
 				}).text('')
 			else 
-				# 设置内容有2个汉字的数字块的字体大小 
-				fontSize = if value is 64 or value is 16384 then @cellFontSize * 0.8 else @cellFontSize
+				# 设置内容有2个汉字的数字块的字体大小26px 
+				fontSize = if value is 64 or value is 16384 then 26 else @cellFontSize
 				cellNode.css({
 					width: @cellSideLength
 					height: @cellSideLength
@@ -200,9 +199,11 @@ class App
 			}, 200)
 		return
 	getPosLeft: (i, j) ->
-		@cellSpace + j * (@cellSpace + @cellSideLength) 
+		@cellSpace + j * (@cellSpace + @cellSideLength)
+
 	getPosTop: (i, j) -> 
 		@cellSpace + i * (@cellSpace + @cellSideLength)
+
 	gameOver: () ->
 		# 不管成功或失败, 显示游戏结束时的视图
 		@board.gameOver( (goodWork, curScoreValue) =>

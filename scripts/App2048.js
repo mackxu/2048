@@ -15,7 +15,7 @@ App = (function() {
     this.$numberCellViews = $('.number-cell');
     this.$scoreView = $('#J_cur-score');
     this.$topScore = $('#J_top-score');
-    this.gridContainerWidth = 460;
+    this.gridContainerWidth = 500;
     this.cellSideLength = 100;
     this.cellSpace = 20;
     this.borderRadius = 10;
@@ -57,15 +57,14 @@ App = (function() {
     var documentWidth, i, j, _i, _j;
     documentWidth = window.screen.availWidth;
     if (documentWidth < 500) {
-      this.gridContainerWidth = 0.92 * documentWidth;
+      this.gridContainerWidth = documentWidth;
       this.cellSideLength = 0.2 * documentWidth;
       this.cellSpace = 0.04 * documentWidth;
       this.borderRadius = 0.02 * documentWidth;
       this.cellFontSize = 40;
       this.$gridContainer.css({
         width: this.gridContainerWidth,
-        height: this.gridContainerWidth,
-        borderRadius: this.borderRadius
+        height: this.gridContainerWidth
       });
       this.$gridCells.css({
         width: this.cellSideLength,
@@ -110,7 +109,7 @@ App = (function() {
             backgroundColor: 'transparent'
           }).text('');
         } else {
-          fontSize = value === 64 || value === 16384 ? _this.cellFontSize * 0.8 : _this.cellFontSize;
+          fontSize = value === 64 || value === 16384 ? 26 : _this.cellFontSize;
           cellNode.css({
             width: _this.cellSideLength,
             height: _this.cellSideLength,
