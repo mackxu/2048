@@ -2,12 +2,19 @@
 var Board;
 
 Board = (function() {
-  var maxNumber;
+  var gameLevel, maxNumber;
 
   maxNumber = 32768;
 
-  function Board(localData) {
+  gameLevel = {
+    level0: 0.1,
+    level1: 0.5,
+    level2: 0.9
+  };
+
+  function Board(level, localData) {
     var cell, i, j, rowCells, _i, _j, _k, _l, _len, _len1, _ref;
+    this.level = level;
     this.numberCells = [];
     this.numberCellHelper = [];
     this.topNumberValue = 0;
@@ -41,7 +48,7 @@ Board = (function() {
       return false;
     }
     randNumberCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
-    randNumberCell.value = Math.random() < 0.9 ? 2 : 4;
+    randNumberCell.value = Math.random() < gameLevel[this.level] ? 2 : 4;
     if (typeof showNumberAnimate === "function") {
       showNumberAnimate(randNumberCell, {
         numberCells: this.numberCells,

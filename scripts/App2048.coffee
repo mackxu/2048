@@ -3,10 +3,12 @@ class App
 	[gameProgress, localTopScore, localCurScore] = ['gameProgress', 'top-score', 'cur-score']
 	localTimer = null 			# 本地存储游戏进度的定时器
 
+	startx = starty = endx = endy = 0
 
 	# 获取页面元素, 添加事件监听器
-	constructor: (@$gridContainer) ->
+	constructor: (@level) ->
 	
+		@$gridContainer = $('#grid-container')
 		@$gridCells = $('.grid-cell')					# 所有棋盘格集合
 		@$gridGameOver = $('#J_gameover')				# 游戏结束的遮罩
 		@$numberCellViews = $('.number-cell');			# 获取所有数字块
@@ -24,8 +26,52 @@ class App
 		# 准备响应式的面板
 		@createResponeBoard()
 
-
 		# 添加事件监听器
+		$(document).on('keydown', (e) =>
+			switch e.which
+				when 37
+					e.preventDefault()
+					@moveCell('moveLeft')
+				when 38
+					e.preventDefault()
+					@moveCell('moveUp')
+				when 39
+					e.preventDefault()
+					@moveCell('moveRight')
+				when 40
+					e.preventDefault()
+					@moveCell('moveDown')
+				else 
+					false
+		)
+
+		@$gridContainer.on(
+			touchstart: (e) =>
+				#
+				touches = e.originalEvent.targetTouches[0]
+				[startx, starty] = [touches.pageX, touches.pageY]
+				return
+
+			touchend: (e) =>
+				#
+				touches = e.originalEvent.changedTouches[0]
+				[endx, endy] = [touches.pageX, touches.pageY]
+
+				# 判断滑动方向, 并执行滑动
+				[deltax, deltay] = [endx - startx, endy - starty]
+				# 过滤不成功的滑动
+				noMoveWidth = 0.3 * @gridContainerWidth
+				return false if Math.abs(deltax) < noMoveWidth and Math.abs(deltay) < noMoveWidth
+				if Math.abs(deltax) >= Math.abs(deltay)
+					@moveCell if deltax > 0 then 'moveRight' else 'moveLeft'
+				else
+					@moveCell if deltay > 0 then 'moveDown' else 'moveUp'
+				return
+			touchmove: (e) ->
+				e.preventDefault()
+				return
+		)
+		
 		$('#J_gamestart')
 			.on('startGame', ( event, clicked ) =>
 				@startGame clicked
@@ -50,12 +96,12 @@ class App
 		history = JSON.parse localStorage.getItem gameProgress
 		# 判断是否是新开始的游戏
 		if clicked is true or history is null or +localStorage.getItem('isGameOver') is 1
-			@board = new Board()
+			@board = new Board @level
 			@updateBoardView()
 			@showOneNumber()
 			@showOneNumber()
 		else 
-			@board = new Board( history )
+			@board = new Board @level, history
 			@updateBoardView()
 
 		# 解决由于本地存储带来的当用户重新打开游戏结束界面时没有提示游戏结束的信息问题
@@ -186,8 +232,7 @@ class App
 				return			
 			, 380)	
 		return
-				
-	
+					
 	showMoveNumber: (moveCells) ->
 		start = moveCells[0]
 		end = moveCells[1]
@@ -219,51 +264,3 @@ class App
 			return
 		)
 		return
-
-# 执行程序
-$ -> 
-	$gridContainer = $('#grid-container')
-	appGame = new App($gridContainer)
-	startx = starty = endx = endy = 0
-	$(document).on('keydown', (e) ->
-		switch e.which
-			when 37
-				e.preventDefault()
-				appGame.moveCell('moveLeft')
-			when 38
-				e.preventDefault()
-				appGame.moveCell('moveUp')
-			when 39
-				e.preventDefault()
-				appGame.moveCell('moveRight')
-			when 40
-				e.preventDefault()
-				appGame.moveCell('moveDown')
-			else 
-				false
-	)
-
-	$gridContainer.on(
-		touchstart: (e) ->
-			#
-			touches = e.originalEvent.targetTouches[0]
-			[startx, starty] = [touches.pageX, touches.pageY]
-
-		touchend: (e) ->
-			#
-			touches = e.originalEvent.changedTouches[0]
-			[endx, endy] = [touches.pageX, touches.pageY]
-
-			# 判断滑动方向, 并执行滑动
-			[deltax, deltay] = [endx - startx, endy - starty]
-			# 过滤不成功的滑动
-			noMoveWidth = 0.3 * appGame.gridContainerWidth
-			return false if Math.abs(deltax) < noMoveWidth and Math.abs(deltay) < noMoveWidth
-			if Math.abs(deltax) >= Math.abs(deltay)
-				appGame.moveCell if deltax > 0 then 'moveRight' else 'moveLeft'
-			else
-				appGame.moveCell if deltay > 0 then 'moveDown' else 'moveUp'
-			return
-		touchmove: (e) ->
-			e.preventDefault()
-	)

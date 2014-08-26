@@ -1,6 +1,8 @@
 class Board
 	maxNumber = 32768
-	constructor: (localData) ->
+	gameLevel = level0: 0.1, level1: 0.5, level2: 0.9
+
+	constructor: (@level, localData) ->
 		@numberCells = []				# 存放二维数组
 		@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
 		@topNumberValue = 0				# 记录数据块最大值
@@ -29,7 +31,7 @@ class Board
 		# 获取随机位置(Math.random() * availCellNum) | 0
 		randNumberCell = @numberCellHelper[(Math.random() * availCellNum) | 0]
 		# 在随机位置上显示随机数字
-		randNumberCell.value = if Math.random() < 0.9 then 2 else 4
+		randNumberCell.value = if Math.random() < gameLevel[@level] then 2 else 4
 		
 		# 传递随机数字块和游戏进度(数字分布和当前得分)
 		showNumberAnimate? randNumberCell, numberCells: @numberCells, curScore: @score

@@ -2,14 +2,17 @@
 var App;
 
 App = (function() {
-  var gameProgress, localCurScore, localTimer, localTopScore, _ref;
+  var endx, endy, gameProgress, localCurScore, localTimer, localTopScore, startx, starty, _ref;
 
   _ref = ['gameProgress', 'top-score', 'cur-score'], gameProgress = _ref[0], localTopScore = _ref[1], localCurScore = _ref[2];
 
   localTimer = null;
 
-  function App($gridContainer) {
-    this.$gridContainer = $gridContainer;
+  startx = starty = endx = endy = 0;
+
+  function App(level) {
+    this.level = level;
+    this.$gridContainer = $('#grid-container');
     this.$gridCells = $('.grid-cell');
     this.$gridGameOver = $('#J_gameover');
     this.$numberCellViews = $('.number-cell');
@@ -21,6 +24,55 @@ App = (function() {
     this.borderRadius = 10;
     this.cellFontSize = 60;
     this.createResponeBoard();
+    $(document).on('keydown', (function(_this) {
+      return function(e) {
+        switch (e.which) {
+          case 37:
+            e.preventDefault();
+            return _this.moveCell('moveLeft');
+          case 38:
+            e.preventDefault();
+            return _this.moveCell('moveUp');
+          case 39:
+            e.preventDefault();
+            return _this.moveCell('moveRight');
+          case 40:
+            e.preventDefault();
+            return _this.moveCell('moveDown');
+          default:
+            return false;
+        }
+      };
+    })(this));
+    this.$gridContainer.on({
+      touchstart: (function(_this) {
+        return function(e) {
+          var touches, _ref1;
+          touches = e.originalEvent.targetTouches[0];
+          _ref1 = [touches.pageX, touches.pageY], startx = _ref1[0], starty = _ref1[1];
+        };
+      })(this),
+      touchend: (function(_this) {
+        return function(e) {
+          var deltax, deltay, noMoveWidth, touches, _ref1, _ref2;
+          touches = e.originalEvent.changedTouches[0];
+          _ref1 = [touches.pageX, touches.pageY], endx = _ref1[0], endy = _ref1[1];
+          _ref2 = [endx - startx, endy - starty], deltax = _ref2[0], deltay = _ref2[1];
+          noMoveWidth = 0.3 * _this.gridContainerWidth;
+          if (Math.abs(deltax) < noMoveWidth && Math.abs(deltay) < noMoveWidth) {
+            return false;
+          }
+          if (Math.abs(deltax) >= Math.abs(deltay)) {
+            _this.moveCell(deltax > 0 ? 'moveRight' : 'moveLeft');
+          } else {
+            _this.moveCell(deltay > 0 ? 'moveDown' : 'moveUp');
+          }
+        };
+      })(this),
+      touchmove: function(e) {
+        e.preventDefault();
+      }
+    });
     $('#J_gamestart').on('startGame', (function(_this) {
       return function(event, clicked) {
         _this.startGame(clicked);
@@ -42,12 +94,12 @@ App = (function() {
     }
     history = JSON.parse(localStorage.getItem(gameProgress));
     if (clicked === true || history === null || +localStorage.getItem('isGameOver') === 1) {
-      this.board = new Board();
+      this.board = new Board(this.level);
       this.updateBoardView();
       this.showOneNumber();
       this.showOneNumber();
     } else {
-      this.board = new Board(history);
+      this.board = new Board(this.level, history);
       this.updateBoardView();
     }
     localStorage.setItem('isGameOver', 0);
@@ -208,53 +260,3 @@ App = (function() {
   return App;
 
 })();
-
-$(function() {
-  var $gridContainer, appGame, endx, endy, startx, starty;
-  $gridContainer = $('#grid-container');
-  appGame = new App($gridContainer);
-  startx = starty = endx = endy = 0;
-  $(document).on('keydown', function(e) {
-    switch (e.which) {
-      case 37:
-        e.preventDefault();
-        return appGame.moveCell('moveLeft');
-      case 38:
-        e.preventDefault();
-        return appGame.moveCell('moveUp');
-      case 39:
-        e.preventDefault();
-        return appGame.moveCell('moveRight');
-      case 40:
-        e.preventDefault();
-        return appGame.moveCell('moveDown');
-      default:
-        return false;
-    }
-  });
-  return $gridContainer.on({
-    touchstart: function(e) {
-      var touches, _ref;
-      touches = e.originalEvent.targetTouches[0];
-      return _ref = [touches.pageX, touches.pageY], startx = _ref[0], starty = _ref[1], _ref;
-    },
-    touchend: function(e) {
-      var deltax, deltay, noMoveWidth, touches, _ref, _ref1;
-      touches = e.originalEvent.changedTouches[0];
-      _ref = [touches.pageX, touches.pageY], endx = _ref[0], endy = _ref[1];
-      _ref1 = [endx - startx, endy - starty], deltax = _ref1[0], deltay = _ref1[1];
-      noMoveWidth = 0.3 * appGame.gridContainerWidth;
-      if (Math.abs(deltax) < noMoveWidth && Math.abs(deltay) < noMoveWidth) {
-        return false;
-      }
-      if (Math.abs(deltax) >= Math.abs(deltay)) {
-        appGame.moveCell(deltax > 0 ? 'moveRight' : 'moveLeft');
-      } else {
-        appGame.moveCell(deltay > 0 ? 'moveDown' : 'moveUp');
-      }
-    },
-    touchmove: function(e) {
-      return e.preventDefault();
-    }
-  });
-});
