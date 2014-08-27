@@ -71,14 +71,6 @@ class App
 				e.preventDefault()
 				return
 		)
-		# 微信分享
-		# alert(WeixinJSBridge)
-		$(document).on('WeixinJSBridgeReady', =>
-			alert(WeixinJSBridge)
-			WeixinJSBridge.on('menu:share:timeline', ->
-				alert(11)
-			)
-		)
 
 		# 用事件监听游戏开始
 		$('#J_gamestart')
