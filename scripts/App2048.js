@@ -161,7 +161,7 @@ App = (function() {
             backgroundColor: 'transparent'
           }).text('');
         } else {
-          fontSize = value === 64 || value === 16384 ? 26 : _this.cellFontSize;
+          fontSize = value === 64 || value === 16384 ? 0.8 * _this.cellFontSize : _this.cellFontSize;
           cellNode.css({
             width: _this.cellSideLength,
             height: _this.cellSideLength,

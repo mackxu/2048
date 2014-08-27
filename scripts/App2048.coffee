@@ -71,7 +71,16 @@ class App
 				e.preventDefault()
 				return
 		)
-		
+		# 微信分享
+		# alert(WeixinJSBridge)
+		$(document).on('WeixinJSBridgeReady', =>
+			alert(WeixinJSBridge)
+			WeixinJSBridge.on('menu:share:timeline', ->
+				alert(11)
+			)
+		)
+
+		# 用事件监听游戏开始
 		$('#J_gamestart')
 			.on('startGame', ( event, clicked ) =>
 				@startGame clicked
@@ -81,6 +90,7 @@ class App
 				$(this).trigger 'startGame', [ true ]
 				return
 			).trigger 'startGame'						# 页面加载时, 游戏开始
+
 		
 	startGame: ( clicked ) -> 
 		
@@ -104,7 +114,8 @@ class App
 			@board = new Board @level, history
 			@updateBoardView()
 
-		# 解决由于本地存储带来的当用户重新打开游戏结束界面时没有提示游戏结束的信息问题
+		# 解决由于本地存储带来的当用户重新打开游戏结束界面时没有提示游戏结束的信息问题.
+		# 方案是, 如果游戏结束标记为1. 当上次游戏结束了再次打开界面时，重新开始游戏
 		# 每次游戏开始, 标识游戏在进行0, 游戏失败为1
 		localStorage.setItem 'isGameOver', 0 
 		return
@@ -171,7 +182,7 @@ class App
 				}).text('')
 			else 
 				# 设置内容有2个汉字的数字块的字体大小26px 
-				fontSize = if value is 64 or value is 16384 then 26 else @cellFontSize
+				fontSize = if value is 64 or value is 16384 then 0.8 * @cellFontSize else @cellFontSize
 				cellNode.css({
 					width: @cellSideLength
 					height: @cellSideLength
