@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>浪淘沙2048</title>
+    <link rel="stylesheet" type="text/css" href="http://qn2048.qiniudn.com/css/2048-tina.css" />  
+</head>
+<body>
+	<header>
+        <h1>浪淘沙2048</h1>
+        <a href="javascript:;" id="J_gamestart">New Game</a>
+        <p><span>当前得分: <b id="J_cur-score">0</b></span>&nbsp;&nbsp;
+            <span>最高得分: <b id="J_top-score">没记录</b></span></p>
+    </header>
+
+    <div id="grid-container">
+        <div class="grid-cell" id="grid-cell-0-0"></div>
+        <div class="grid-cell" id="grid-cell-0-1"></div>
+        <div class="grid-cell" id="grid-cell-0-2"></div>
+        <div class="grid-cell" id="grid-cell-0-3"></div>
+
+        <div class="grid-cell" id="grid-cell-1-0"></div>
+        <div class="grid-cell" id="grid-cell-1-1"></div>
+        <div class="grid-cell" id="grid-cell-1-2"></div>
+        <div class="grid-cell" id="grid-cell-1-3"></div>
+
+        <div class="grid-cell" id="grid-cell-2-0"></div>
+        <div class="grid-cell" id="grid-cell-2-1"></div>
+        <div class="grid-cell" id="grid-cell-2-2"></div>
+        <div class="grid-cell" id="grid-cell-2-3"></div>
+
+        <div class="grid-cell" id="grid-cell-3-0"></div>
+        <div class="grid-cell" id="grid-cell-3-1"></div>
+        <div class="grid-cell" id="grid-cell-3-2"></div>
+        <div class="grid-cell" id="grid-cell-3-3"></div>
+
+        <div class="number-cell" id="number-cell-0-0"></div>
+        <div class="number-cell" id="number-cell-0-1"></div>
+        <div class="number-cell" id="number-cell-0-2"></div>
+        <div class="number-cell" id="number-cell-0-3"></div>
+
+        <div class="number-cell" id="number-cell-1-0"></div>
+        <div class="number-cell" id="number-cell-1-1"></div>
+        <div class="number-cell" id="number-cell-1-2"></div>
+        <div class="number-cell" id="number-cell-1-3"></div>
+
+        <div class="number-cell" id="number-cell-2-0"></div>
+        <div class="number-cell" id="number-cell-2-1"></div>
+        <div class="number-cell" id="number-cell-2-2"></div>
+        <div class="number-cell" id="number-cell-2-3"></div>
+
+        <div class="number-cell" id="number-cell-3-0"></div>
+        <div class="number-cell" id="number-cell-3-1"></div>
+        <div class="number-cell" id="number-cell-3-2"></div>
+        <div class="number-cell" id="number-cell-3-3"></div>
+        <!-- 比赛结束时的遮罩 -->
+        <div class="grid-gameover" id="J_gameover">You Win!</div>
+    </div>
+    <!-- // 棋盘格结束 -->
+	<script type="text/javascript" src="http://qn2048.qiniudn.com/scripts/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="http://qn2048.qiniudn.com/scripts/number-tina.js"></script>
+    <script type="text/javascript" src="http://qn2048.qiniudn.com/scripts/board-tina.js"></script>
+    <script type="text/javascript" src="http://qn2048.qiniudn.com/scripts/App2048-tina.js"></script>
+    <script>
+        $(function() {
+            appGame = new App('level0')
+        })
+    </script>
+</body>
+</html>
