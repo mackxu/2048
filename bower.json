@@ -1,0 +1,11 @@
+{
+  "name": "2048",
+  "version": "1.0.0",
+  "homepage": "https://github.com/mackxu/2048",
+  "authors": [
+    "mackxu <xydjob@gmail.com>"
+  ],
+  "description": "休闲游戏",
+  "license": "MIT",
+  "private": true
+}
