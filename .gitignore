@@ -1,2 +1,3 @@
 .DS_Store
 .qrsignore
+scripts/*.js
