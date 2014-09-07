@@ -2,7 +2,7 @@
 var App;
 
 App = (function() {
-  var endx, endy, gameProgress, localCurScore, localTimer, localTopScore, startx, starty, _ref;
+  var $$, endx, endy, gameProgress, localCurScore, localTimer, localTopScore, startx, starty, _ref;
 
   _ref = ['gameProgress', 'top-score', 'cur-score'], gameProgress = _ref[0], localTopScore = _ref[1], localCurScore = _ref[2];
 
@@ -10,9 +10,13 @@ App = (function() {
 
   startx = starty = endx = endy = 0;
 
+  $$ = {
+    gameover: $('#J_gamestart'),
+    gridContainer: $('#grid-container')
+  };
+
   function App(level) {
     this.level = level;
-    this.$gridContainer = $('#grid-container');
     this.$gridCells = $('.grid-cell');
     this.$gridGameOver = $('#J_gameover');
     this.$numberCellViews = $('.number-cell');
@@ -24,6 +28,44 @@ App = (function() {
     this.borderRadius = 10;
     this.cellFontSize = 60;
     this.createResponeBoard();
+    this.initEvent();
+    return;
+  }
+
+  App.prototype.createResponeBoard = function() {
+    var documentWidth, i, j, _i, _j;
+    documentWidth = window.screen.availWidth;
+    if (documentWidth < 500) {
+      this.gridContainerWidth = documentWidth;
+      this.cellSideLength = 0.2 * documentWidth;
+      this.cellSpace = 0.04 * documentWidth;
+      this.borderRadius = 0.02 * documentWidth;
+      this.cellFontSize = 40;
+      $$.gridContainer.css({
+        width: this.gridContainerWidth,
+        height: this.gridContainerWidth
+      });
+      this.$gridCells.css({
+        width: this.cellSideLength,
+        height: this.cellSideLength,
+        borderRadius: this.borderRadius
+      });
+      this.$gridGameOver.css({
+        lineHeight: this.gridContainerWidth + 'px',
+        borderRadius: this.borderRadius
+      });
+    }
+    for (i = _i = 0; _i < 4; i = ++_i) {
+      for (j = _j = 0; _j < 4; j = ++_j) {
+        $(this.$gridCells[4 * i + j]).css({
+          top: this.getPosTop(i, j),
+          left: this.getPosLeft(i, j)
+        });
+      }
+    }
+  };
+
+  App.prototype.initEvent = function() {
     $(document).on('keydown', (function(_this) {
       return function(e) {
         switch (e.which) {
@@ -44,7 +86,7 @@ App = (function() {
         }
       };
     })(this));
-    this.$gridContainer.on({
+    $$.gridContainer.on({
       touchstart: (function(_this) {
         return function(e) {
           var touches, _ref1;
@@ -73,19 +115,21 @@ App = (function() {
         e.preventDefault();
       }
     });
-    $('#J_gamestart').on('startGame', (function(_this) {
+    $$.gameover.on('startGame', (function(_this) {
       return function(event, clicked) {
         _this.startGame(clicked);
       };
     })(this)).on('click', function() {
       $(this).trigger('startGame', [true]);
     }).trigger('startGame');
-  }
+  };
+
+  App.prototype.weixinEvent = function() {};
 
   App.prototype.startGame = function(clicked) {
     var history;
     this.isGameOver = false;
-    this.$gridGameOver.css({
+    clicked && this.$gridGameOver.css({
       display: 'none'
     });
     this.topScoreValue = localStorage.getItem(localTopScore) | 0;
@@ -103,39 +147,6 @@ App = (function() {
       this.updateBoardView();
     }
     localStorage.setItem('isGameOver', 0);
-  };
-
-  App.prototype.createResponeBoard = function() {
-    var documentWidth, i, j, _i, _j;
-    documentWidth = window.screen.availWidth;
-    if (documentWidth < 500) {
-      this.gridContainerWidth = documentWidth;
-      this.cellSideLength = 0.2 * documentWidth;
-      this.cellSpace = 0.04 * documentWidth;
-      this.borderRadius = 0.02 * documentWidth;
-      this.cellFontSize = 40;
-      this.$gridContainer.css({
-        width: this.gridContainerWidth,
-        height: this.gridContainerWidth
-      });
-      this.$gridCells.css({
-        width: this.cellSideLength,
-        height: this.cellSideLength,
-        borderRadius: this.borderRadius
-      });
-      this.$gridGameOver.css({
-        lineHeight: this.gridContainerWidth + 'px',
-        borderRadius: this.borderRadius
-      });
-    }
-    for (i = _i = 0; _i < 4; i = ++_i) {
-      for (j = _j = 0; _j < 4; j = ++_j) {
-        $(this.$gridCells[4 * i + j]).css({
-          top: this.getPosTop(i, j),
-          left: this.getPosLeft(i, j)
-        });
-      }
-    }
   };
 
   App.prototype.updateBoardView = function() {

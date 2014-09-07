@@ -4,11 +4,14 @@ class App
 	localTimer = null 			# 本地存储游戏进度的定时器
 
 	startx = starty = endx = endy = 0
+	$$ = 
+		gameover: $('#J_gamestart')
+		gridContainer: $('#grid-container')
 
 	# 获取页面元素, 添加事件监听器
 	constructor: (@level) ->
 	
-		@$gridContainer = $('#grid-container')
+		# $$.gridContainer = $('#grid-container')
 		@$gridCells = $('.grid-cell')					# 所有棋盘格集合
 		@$gridGameOver = $('#J_gameover')				# 游戏结束的遮罩
 		@$numberCellViews = $('.number-cell');			# 获取所有数字块
@@ -25,8 +28,50 @@ class App
 
 		# 准备响应式的面板
 		@createResponeBoard()
-
 		# 添加事件监听器
+		@initEvent()
+		return	
+	
+	createResponeBoard: () ->
+		documentWidth = window.screen.availWidth
+
+		# 移动设备的参数, 调整视图
+		if documentWidth < 500 
+			@gridContainerWidth = documentWidth
+			@cellSideLength = 0.2 * documentWidth
+			@cellSpace = 0.04 * documentWidth
+			@borderRadius = 0.02 * documentWidth
+
+			@cellFontSize = 40
+			# 棋盘外围框架
+			$$.gridContainer.css({
+				width: @gridContainerWidth
+				height: @gridContainerWidth
+			})
+			# 棋盘格
+			@$gridCells.css(
+				width: @cellSideLength
+				height: @cellSideLength
+				borderRadius: @borderRadius
+			)
+			# 调整遮罩的行高和圆角大小
+			@$gridGameOver.css(
+				lineHeight: @gridContainerWidth + 'px'
+				borderRadius: @borderRadius
+			)
+
+		# 动态生成棋盘格
+		for i in [0...4]
+			for j in [0...4]
+				$(@$gridCells[4 * i + j]).css(
+					top: @getPosTop(i, j)
+					left: @getPosLeft(i, j)
+				)
+
+		return
+
+	initEvent: () ->
+		# PC端使用上下左右键盘
 		$(document).on('keydown', (e) =>
 			switch e.which
 				when 37
@@ -45,7 +90,7 @@ class App
 					false
 		)
 
-		@$gridContainer.on(
+		$$.gridContainer.on(
 			touchstart: (e) =>
 				#
 				touches = e.originalEvent.targetTouches[0]
@@ -73,7 +118,7 @@ class App
 		)
 
 		# 用事件监听游戏开始
-		$('#J_gamestart')
+		$$.gameover
 			.on('startGame', ( event, clicked ) =>
 				@startGame clicked
 				return
@@ -82,13 +127,16 @@ class App
 				$(this).trigger 'startGame', [ true ]
 				return
 			).trigger 'startGame'						# 页面加载时, 游戏开始
+		return
 
-		
+	weixinEvent: () ->
+		return
+
 	startGame: ( clicked ) -> 
 		
 		@isGameOver = false
-		# 玩家开始完时, 隐藏遮罩
-		@$gridGameOver.css display: 'none'
+		# 玩家点击开始游戏时, 隐藏遮罩
+		clicked and @$gridGameOver.css display: 'none'
 		
 		# 如果存在本地存储的最高得分记录, 就显示出来
 		@topScoreValue = localStorage.getItem(localTopScore) | 0
@@ -110,44 +158,6 @@ class App
 		# 方案是, 如果游戏结束标记为1. 当上次游戏结束了再次打开界面时，重新开始游戏
 		# 每次游戏开始, 标识游戏在进行0, 游戏失败为1
 		localStorage.setItem 'isGameOver', 0 
-		return
-	
-	createResponeBoard: () ->
-		documentWidth = window.screen.availWidth
-
-		# 移动设备的参数, 调整视图
-		if documentWidth < 500 
-			@gridContainerWidth = documentWidth
-			@cellSideLength = 0.2 * documentWidth
-			@cellSpace = 0.04 * documentWidth
-			@borderRadius = 0.02 * documentWidth
-
-			@cellFontSize = 40
-			# 棋盘外围框架
-			@$gridContainer.css({
-				width: @gridContainerWidth
-				height: @gridContainerWidth
-			})
-			# 棋盘格
-			@$gridCells.css(
-				width: @cellSideLength
-				height: @cellSideLength
-				borderRadius: @borderRadius
-			)
-			# 调整遮罩的行高和圆角大小
-			@$gridGameOver.css(
-				lineHeight: @gridContainerWidth + 'px'
-				borderRadius: @borderRadius
-			)
-
-		# 动态生成棋盘格
-		for i in [0...4]
-			for j in [0...4]
-				$(@$gridCells[4 * i + j]).css(
-					top: @getPosTop(i, j)
-					left: @getPosLeft(i, j)
-				)
-
 		return
 
 	updateBoardView: () ->
