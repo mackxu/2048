@@ -5,9 +5,6 @@ define ['jQuery', 'board'], ($, Board) ->
 		localTimer = null 			# 本地存储游戏进度的定时器
 
 		startx = starty = endx = endy = 0
-		# $$ = 
-		# 	gameover: $('#J_gamestart')
-		# 	gridContainer: $('#grid-container')
 
 		# 获取页面元素, 添加事件监听器
 		constructor: (@level) ->
@@ -35,8 +32,9 @@ define ['jQuery', 'board'], ($, Board) ->
 		
 		# 让数字块自适应设备
 		createResponeBoard: () ->
-			documentWidth = window.screen.availWidth
-
+			# 用window.innerWidth替换window.screen.availwidth
+			documentWidth = window.innerWidth
+			
 			# 移动设备的参数, 调整视图
 			if documentWidth < 500 
 				@gridContainerWidth = documentWidth
