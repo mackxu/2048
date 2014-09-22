@@ -1,4 +1,5 @@
 define ['jQuery', 'board'], ($, Board) ->
+	'use strict';
 	class App
 		# 私有变量
 		[gameProgress, localTopScore, localCurScore] = ['gameProgress', 'top-score', 'cur-score']

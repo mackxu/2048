@@ -1,4 +1,5 @@
 define () ->
+	'use strict';
 	class Number
 		constructor: (@value, @x, @y) ->
 			 @merged = false

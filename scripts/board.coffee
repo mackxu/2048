@@ -1,4 +1,5 @@
 define ['number'], (Number) ->
+	'use strict';
 	class Board
 		maxNumber = 32768
 		gameLevel = level0: 0.1, level1: 0.5, level2: 0.9
