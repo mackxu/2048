@@ -1,17 +1,17 @@
 define ['jQuery', 'board'], ($, Board) ->
+	'use strict';
 	class App
 		# 私有变量
 		[gameProgress, localTopScore, localCurScore] = ['gameProgress', 'top-score', 'cur-score']
 		localTimer = null 			# 本地存储游戏进度的定时器
 
 		startx = starty = endx = endy = 0
-		# $$ = 
-		# 	gameover: $('#J_gamestart')
-		# 	gridContainer: $('#grid-container')
 
 		# 获取页面元素, 添加事件监听器
 		constructor: (@level) ->
-		
+			
+			@$loading = $('#J_loading')
+			
 			@$gridContainer = $('#grid-container')
 			@$gridCells = $('.grid-cell')					# 所有棋盘格集合
 			@$gridGameOver = $('#J_gameover')				# 游戏结束的遮罩
@@ -27,7 +27,8 @@ define ['jQuery', 'board'], ($, Board) ->
 			@borderRadius = 10
 
 			@cellFontSize = 60
-
+			# 隐藏加载界面
+			@$loading.fadeOut()
 			# 准备响应式的面板
 			@createResponeBoard()
 			# 添加事件监听器
@@ -35,8 +36,9 @@ define ['jQuery', 'board'], ($, Board) ->
 		
 		# 让数字块自适应设备
 		createResponeBoard: () ->
-			documentWidth = window.screen.availWidth
-
+			# 用window.innerWidth替换window.screen.availwidth
+			documentWidth = window.innerWidth
+			
 			# 移动设备的参数, 调整视图
 			if documentWidth < 500 
 				@gridContainerWidth = documentWidth
@@ -140,7 +142,7 @@ define ['jQuery', 'board'], ($, Board) ->
 			
 			@isGameOver = false
 			# 玩家点击开始游戏时, 隐藏遮罩
-			clicked and @$gridGameOver.css display: 'none'
+			clicked and @$gridGameOver.hide()
 			
 			# 如果存在本地存储的最高得分记录, 就显示出来
 			@topScoreValue = localStorage.getItem(localTopScore) | 0
@@ -159,7 +161,7 @@ define ['jQuery', 'board'], ($, Board) ->
 				@updateBoardView()
 
 			# 解决由于本地存储带来的当用户重新打开游戏结束界面时没有提示游戏结束的信息问题.
-			# 方案是, 如果游戏结束标记为1. 当上次游戏结束了再次打开界面时，重新开始游戏
+			# 方案是, 如果游戏结束标记为1. 当上次游戏结束了再次打开界面时，重新开启游戏
 			# 每次游戏开始, 标识游戏在进行0, 游戏失败为1
 			localStorage.setItem 'isGameOver', 0 
 			return
@@ -173,7 +175,7 @@ define ['jQuery', 'board'], ($, Board) ->
 			# 校正数据块视图
 			@board.updateAllcells( (numberCell) => 
 				{ x, y, value } = numberCell
-				cellNode = $(@$numberCellViews[x * 4 + y]).css('display', 'none')
+				cellNode = $(@$numberCellViews[x * 4 + y])
 				[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 				
 				if value is 0
@@ -199,7 +201,6 @@ define ['jQuery', 'board'], ($, Board) ->
 						color: numberCell.getColor()
 						backgroundColor: numberCell.getBgColor() 
 					}).text(numberCell.getText())
-				cellNode.css('display', 'block')
 			)
 			return
 		

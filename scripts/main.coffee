@@ -1,5 +1,5 @@
 
-require.config(
+require.config
 	baseUrl: 'http://qn2048.qiniudn.com/scripts'	# 指定所有模块js的查找根路径
 	paths:
 		jQuery: 'lib/jquery-1.9.0'
@@ -7,7 +7,7 @@ require.config(
 	shim:
 		jQuery:
 			exports: 'jQuery'
-)
+
 
 require ['jQuery', 'App2048'], ($, App) ->
 	$( ->
