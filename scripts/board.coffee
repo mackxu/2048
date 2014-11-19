@@ -32,7 +32,7 @@ define ['number'], (Number) ->
 			return false if availCellNum is 0
 			# 获取随机位置(Math.random() * availCellNum) | 0
 			randNumberCell = @numberCellHelper[(Math.random() * availCellNum) | 0]
-			# 在随机位置上显示随机数字
+			# 在随机位置上显示随机数字(2或4)
 			randNumberCell.value = if Math.random() < gameLevel[@level] then 2 else 4
 			
 			# 传递随机数字块和游戏进度(数字分布和当前得分)
