@@ -23,20 +23,24 @@ define ['number'], (Number) ->
 				for i in [0...4]
 					@numberCells[i] = []
 					for j in [0...4]
-						@numberCells[i][j] = new Number 0, i, j 
+						# 把此处的初始值为0改为1
+						# 用于获取用数组存储的数据 Math.log2(1) === 0
+						@numberCells[i][j] = new Number 1, i, j 			 
 
+		# generateOneNumber 职责不单一, 待优化
 		generateOneNumber: (showNumberAnimate) ->
+			# 剩余的数字块的长度
 			availCellNum = @numberCellHelper.length
-			
-			# 当数字块排满的时
+			# 当没有剩余数字块时
 			return false if availCellNum is 0
+
 			# 获取随机位置(Math.random() * availCellNum) | 0
-			randNumberCell = @numberCellHelper[(Math.random() * availCellNum) | 0]
+			randomCell = @numberCellHelper[(Math.random() * availCellNum) | 0]
 			# 在随机位置上显示随机数字(2或4)
-			randNumberCell.value = if Math.random() < gameLevel[@level] then 2 else 4
+			randomCell.value = if Math.random() < gameLevel[@level] then 2 else 4
 			
 			# 传递随机数字块和游戏进度(数字分布和当前得分)
-			showNumberAnimate? randNumberCell, numberCells: @numberCells, curScore: @score
+			showNumberAnimate? randomCell, numberCells: @numberCells, curScore: @score
 			return true
 		
 		# 把每个数据在数据块内显示

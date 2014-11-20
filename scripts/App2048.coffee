@@ -1,12 +1,12 @@
-define ['jQuery', 'board'], ($, Board) ->
+define ['board'], (Board) ->
 	'use strict';
+
+	# 私有变量
+	[gameProgress, localTopScore, localCurScore] = ['gameProgress', 'top-score', 'cur-score']
+	localTimer = null 			# 本地存储游戏进度的定时器
+
+	startx = starty = endx = endy = 0
 	class App
-		# 私有变量
-		[gameProgress, localTopScore, localCurScore] = ['gameProgress', 'top-score', 'cur-score']
-		localTimer = null 			# 本地存储游戏进度的定时器
-
-		startx = starty = endx = endy = 0
-
 		# 获取页面元素, 添加事件监听器
 		constructor: (@level) ->
 			
@@ -282,3 +282,4 @@ define ['jQuery', 'board'], ($, Board) ->
 				return
 			)
 			return
+	return App
