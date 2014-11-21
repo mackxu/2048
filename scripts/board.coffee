@@ -50,8 +50,8 @@ define ['number'], (Number) ->
 			for rowCells in @numberCells
 				for cell in rowCells
 					cell.merged = false
-					# 存放值为0的数字块对象
-					@numberCellHelper.push(cell) if cell.value is 0
+					# 存放值为1的数字块对象
+					@numberCellHelper.push(cell) if cell.value is 1
 					showOneNumber cell
 			return
 		
@@ -60,7 +60,7 @@ define ['number'], (Number) ->
 			startCell = @numberCells[fx][fy]
 			targetCell = @numberCells[tx][ty]
 			isSameCell = startCell.value is targetCell.value
-			if targetCell.value is 0 or isSameCell
+			if targetCell.value is 1 or isSameCell
 				# 数据块之间有障碍物, 返回false
 				return false if not @noBlock fx, fy, tx, ty		
 
@@ -71,7 +71,7 @@ define ['number'], (Number) ->
 				
 				moveCellAnimate startCell, targetCell
 				targetCell.value += startCell.value
-				startCell.value = 0
+				startCell.value = 1
 				# 更新数据块最大值
 				@topNumberValue = targetCell.value if isSameCell and @topNumberValue < targetCell.value			
 				return true
@@ -84,16 +84,16 @@ define ['number'], (Number) ->
 				updateScoreView @score
 			return
 		
-		noBlock: (x1, y1, x2, y2) ->
-			if y1 is y2
-				if x1 < x2 then x1 += 1 else x1 -= 1
-				for x in [x1...x2]
-					# 如果不为0, 此路不通
-					return false if @numberCells[x][y1].value isnt 0
+		noBlock: (fx, fy, tx, ty) ->
+			if fy is ty
+				if fx < tx then fx += 1 else fx -= 1
+				for x in [fx...tx]
+					# 如果不为1, 此路不通
+					return false if @numberCells[x][fy].value isnt 1
 			else
-				if y1 < y2 then y1 += 1 else y1 -=1
-				for y in [y1...y2]
-					return false if @numberCells[x1][y].value isnt 0
+				if fy < ty then fy += 1 else fy -= 1
+				for y in [fy...ty]
+					return false if @numberCells[fx][y].value isnt 1
 			return true
 
 		canMoveLeft: () ->
@@ -102,9 +102,9 @@ define ['number'], (Number) ->
 			for i in [0...4]
 				for j in [1...4]		
 					curCell = @numberCells[i][j]
-					if curCell.value isnt 0
+					if curCell.value isnt 1
 						nextCell = @numberCells[i][j-1]
-						if nextCell.value is 0 or curCell.value is nextCell.value
+						if nextCell.value is 1 or curCell.value is nextCell.value
 							return true 
 			return false
 						
@@ -112,27 +112,27 @@ define ['number'], (Number) ->
 			for i in [0...4]
 				for j in [3...0]
 					curCell = @numberCells[i][j-1]
-					if curCell.value isnt 0
+					if curCell.value isnt 1
 						nextCell = @numberCells[i][j]
-						if nextCell.value is 0 or curCell.value is nextCell.value
+						if nextCell.value is 1 or curCell.value is nextCell.value
 							return true 
 			return false
 		canMoveUp: () ->
 			for j in [0...4]
 				for i in [1...4]			
 					curCell = @numberCells[i][j]
-					if curCell.value isnt 0
+					if curCell.value isnt 1
 						nextCell = @numberCells[i-1][j]
-						if nextCell.value is 0 or curCell.value is nextCell.value
+						if nextCell.value is 1 or curCell.value is nextCell.value
 							return true
 			return false
 		canMoveDown: () ->
 			for j in [0...4]
 				for i in [3...0]			
 					curCell = @numberCells[i-1][j]
-					if curCell.value isnt 0
+					if curCell.value isnt 1
 						nextCell = @numberCells[i][j]
-						if nextCell.value is 0 or curCell.value is nextCell.value
+						if nextCell.value is 1 or curCell.value is nextCell.value
 							return true
 			return false
 		
@@ -141,8 +141,8 @@ define ['number'], (Number) ->
 			
 			for i in [0...4]			
 				for j in [1...4]			
-					# 寻找值不为0的数据块, 并显示滑动动画
-					if @numberCells[i][j].value isnt 0					
+					# 寻找值不为1的数据块, 并显示滑动动画
+					if @numberCells[i][j].value isnt 1					
 						for k in [0...j]					
 							# 如果数字块能更新成功, 跳出该层循环
 							# 寻找下一个值不为0的数字块
@@ -154,7 +154,7 @@ define ['number'], (Number) ->
 
 			for i in [0...4]
 				for j in [2..0]	
-					if @numberCells[i][j].value isnt 0			# 待滑动数字块
+					if @numberCells[i][j].value isnt 1			# 待滑动数字块
 						for k in [3...j]
 							# 如果数字块能更新成功, 跳出该层循环
 							# 寻找下一个值不为0的数字块
@@ -166,10 +166,10 @@ define ['number'], (Number) ->
 
 			for j in [0...4]			
 				for i in [1...4]
-					if @numberCells[i][j].value isnt 0					
+					if @numberCells[i][j].value isnt 1					
 						for k in [0...i]					
 							# 如果数字块能更新成功, 跳出该层循环
-							# 寻找下一个值不为0的数字块
+							# 寻找下一个值不为1的数字块
 							break if @updateCell i, j, k, j, moveCellAnimate
 			return true
 
@@ -178,7 +178,7 @@ define ['number'], (Number) ->
 
 			for j in [0...4]			
 				for i in [2..0]
-					if @numberCells[i][j].value isnt 0					
+					if @numberCells[i][j].value isnt 1					
 						for k in [3...i]					
 							# 如果数字块能更新成功, 跳出该层循环
 							# 寻找下一个值不为0的数字块

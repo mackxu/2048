@@ -178,7 +178,7 @@ define ['board'], (Board) ->
 				cellNode = $(@$numberCellViews[x * 4 + y])
 				[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 				
-				if value is 0
+				if value is 1
 					cellNode.css({
 						width: 0
 						height: 0
@@ -201,6 +201,7 @@ define ['board'], (Board) ->
 						color: numberCell.getColor()
 						backgroundColor: numberCell.getBgColor() 
 					}).text(numberCell.getText())
+				return
 			)
 			return
 		

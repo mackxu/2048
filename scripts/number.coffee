@@ -1,8 +1,8 @@
 define () ->
 	'use strict';
 	# 用对象存放数据
-	dynasty = ['transparent', '夏', '商', '周', '秦', '汉', '三国', '晋', '隋', '唐', '宋', '元', '明', '清', '民国', 'PRC']
-	bgColors = ['', '#eee4da', '#ede0c8', '#f2b179', '#f59563', '#f67c5f', '#f65e3b', '#edcf72', '#edcc61', '#9c0', '#33b5e5', '#09c', '#a6c', '#93c', '#2E4E7E', '#FF2121']
+	dynasty = ['', '夏', '商', '周', '秦', '汉', '三国', '晋', '隋', '唐', '宋', '元', '明', '清', '民国', 'PRC']
+	bgColors = ['transparent', '#eee4da', '#ede0c8', '#f2b179', '#f59563', '#f67c5f', '#f65e3b', '#edcf72', '#edcc61', '#9c0', '#33b5e5', '#09c', '#a6c', '#93c', '#2E4E7E', '#FF2121']
 	class Number
 		# 对象的属性: value、x、y、merged
 		constructor: (@value, @x, @y) ->
@@ -13,8 +13,7 @@ define () ->
 		
 		# 根据数值，返回背景色
 		getBgColor: () ->
-			bgColors[Math.ceil Math.log2(@value)] or 'transparent'
-
+			bgColors[Math.ceil Math.log2(@value)]
 		# 根据数据值返回文本
 		getText: () ->
 			dynasty[Math.ceil Math.log2(@value)]
