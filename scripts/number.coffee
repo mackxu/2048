@@ -21,5 +21,6 @@ define () ->
 			if @value is 64 or @value is 16384 then 49 else 60
 		# 当对象需要转换为字符串时, 调用该方法
 		toString: () ->
-			@value
+			# 属性merge的值的改变是在两次滑动动作之间，因此在结构上看到的永远是false
+			JSON.stringify(@)
 		

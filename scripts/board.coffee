@@ -67,11 +67,12 @@ define ['number'], (Number) ->
 				if isSameCell								# 两个数字块的值相等			
 					return false if targetCell.merged 		# 如果已经有合并, 本目标元素不合适
 					@addScore += startCell.value			# 数字合并, 奖励分数
+					targetCell.value = 2 * startCell.value
 					targetCell.merged = true				# 标记本航道已经有数字相加了
-				
+				else
+					targetCell.value = startCell.value 		# 如果目标位置为空，把值copy过去 
+				startCell.value = 1 						# 把运动的数字块的值恢复为默认
 				moveCellAnimate startCell, targetCell
-				targetCell.value += startCell.value
-				startCell.value = 1
 				# 更新数据块最大值
 				@topNumberValue = targetCell.value if isSameCell and @topNumberValue < targetCell.value			
 				return true

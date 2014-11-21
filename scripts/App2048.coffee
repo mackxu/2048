@@ -153,12 +153,12 @@ define ['board'], (Board) ->
 			# 判断是否是新开始的游戏
 			if clicked is true or history is null or +localStorage.getItem('isGameOver') is 1
 				@board = new Board @level
-				@updateBoardView()
+				@renderBoard()
 				@showOneNumber()
 				@showOneNumber()
 			else 
 				@board = new Board @level, history
-				@updateBoardView()
+				@renderBoard()
 
 			# 解决由于本地存储带来的当用户重新打开游戏结束界面时没有提示游戏结束的信息问题.
 			# 方案是, 如果游戏结束标记为1. 当上次游戏结束了再次打开界面时，重新开启游戏
@@ -166,7 +166,9 @@ define ['board'], (Board) ->
 			localStorage.setItem 'isGameOver', 0 
 			return
 
-		updateBoardView: () ->
+		renderBoard: () ->
+			# 绘制游戏主面板
+			
 			# 刷新战绩榜
 			@board.updateScore((score) =>
 				@$scoreView.text(score)
@@ -176,6 +178,7 @@ define ['board'], (Board) ->
 			@board.updateAllcells( (numberCell) => 
 				{ x, y, value } = numberCell
 				cellNode = $(@$numberCellViews[x * 4 + y])
+				cellNode.attr 'data-cell', numberCell.toString()
 				[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 				
 				if value is 1
@@ -242,7 +245,7 @@ define ['board'], (Board) ->
 			if canMove
 				# 每次滑动后, 刷新棋盘格并生成新数字块
 				setTimeout( =>
-					@updateBoardView()
+					@renderBoard()
 					@showOneNumber()			# 拥有50ms的动画
 					return			
 				, 300)
