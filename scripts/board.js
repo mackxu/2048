@@ -36,22 +36,22 @@ define(['number'], function(Number) {
         for (i = _k = 0; _k < 4; i = ++_k) {
           this.numberCells[i] = [];
           for (j = _l = 0; _l < 4; j = ++_l) {
-            this.numberCells[i][j] = new Number(0, i, j);
+            this.numberCells[i][j] = new Number(1, i, j);
           }
         }
       }
     }
 
     Board.prototype.generateOneNumber = function(showNumberAnimate) {
-      var availCellNum, randNumberCell;
+      var availCellNum, randomCell;
       availCellNum = this.numberCellHelper.length;
       if (availCellNum === 0) {
         return false;
       }
-      randNumberCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
-      randNumberCell.value = Math.random() < gameLevel[this.level] ? 2 : 4;
+      randomCell = this.numberCellHelper[(Math.random() * availCellNum) | 0];
+      randomCell.value = Math.random() < gameLevel[this.level] ? 2 : 4;
       if (typeof showNumberAnimate === "function") {
-        showNumberAnimate(randNumberCell, {
+        showNumberAnimate(randomCell, {
           numberCells: this.numberCells,
           curScore: this.score
         });
@@ -69,7 +69,7 @@ define(['number'], function(Number) {
         for (_j = 0, _len1 = rowCells.length; _j < _len1; _j++) {
           cell = rowCells[_j];
           cell.merged = false;
-          if (cell.value === 0) {
+          if (cell.value === 1) {
             this.numberCellHelper.push(cell);
           }
           showOneNumber(cell);
@@ -82,7 +82,7 @@ define(['number'], function(Number) {
       startCell = this.numberCells[fx][fy];
       targetCell = this.numberCells[tx][ty];
       isSameCell = startCell.value === targetCell.value;
-      if (targetCell.value === 0 || isSameCell) {
+      if (targetCell.value === 1 || isSameCell) {
         if (!this.noBlock(fx, fy, tx, ty)) {
           return false;
         }
@@ -91,11 +91,13 @@ define(['number'], function(Number) {
             return false;
           }
           this.addScore += startCell.value;
+          targetCell.value = 2 * startCell.value;
           targetCell.merged = true;
+        } else {
+          targetCell.value = startCell.value;
         }
+        startCell.value = 1;
         moveCellAnimate(startCell, targetCell);
-        targetCell.value += startCell.value;
-        startCell.value = 0;
         if (isSameCell && this.topNumberValue < targetCell.value) {
           this.topNumberValue = targetCell.value;
         }
@@ -111,27 +113,27 @@ define(['number'], function(Number) {
       }
     };
 
-    Board.prototype.noBlock = function(x1, y1, x2, y2) {
+    Board.prototype.noBlock = function(fx, fy, tx, ty) {
       var x, y, _i, _j;
-      if (y1 === y2) {
-        if (x1 < x2) {
-          x1 += 1;
+      if (fy === ty) {
+        if (fx < tx) {
+          fx += 1;
         } else {
-          x1 -= 1;
+          fx -= 1;
         }
-        for (x = _i = x1; x1 <= x2 ? _i < x2 : _i > x2; x = x1 <= x2 ? ++_i : --_i) {
-          if (this.numberCells[x][y1].value !== 0) {
+        for (x = _i = fx; fx <= tx ? _i < tx : _i > tx; x = fx <= tx ? ++_i : --_i) {
+          if (this.numberCells[x][fy].value !== 1) {
             return false;
           }
         }
       } else {
-        if (y1 < y2) {
-          y1 += 1;
+        if (fy < ty) {
+          fy += 1;
         } else {
-          y1 -= 1;
+          fy -= 1;
         }
-        for (y = _j = y1; y1 <= y2 ? _j < y2 : _j > y2; y = y1 <= y2 ? ++_j : --_j) {
-          if (this.numberCells[x1][y].value !== 0) {
+        for (y = _j = fy; fy <= ty ? _j < ty : _j > ty; y = fy <= ty ? ++_j : --_j) {
+          if (this.numberCells[fx][y].value !== 1) {
             return false;
           }
         }
@@ -144,9 +146,9 @@ define(['number'], function(Number) {
       for (i = _i = 0; _i < 4; i = ++_i) {
         for (j = _j = 1; _j < 4; j = ++_j) {
           curCell = this.numberCells[i][j];
-          if (curCell.value !== 0) {
+          if (curCell.value !== 1) {
             nextCell = this.numberCells[i][j - 1];
-            if (nextCell.value === 0 || curCell.value === nextCell.value) {
+            if (nextCell.value === 1 || curCell.value === nextCell.value) {
               return true;
             }
           }
@@ -160,9 +162,9 @@ define(['number'], function(Number) {
       for (i = _i = 0; _i < 4; i = ++_i) {
         for (j = _j = 3; _j > 0; j = --_j) {
           curCell = this.numberCells[i][j - 1];
-          if (curCell.value !== 0) {
+          if (curCell.value !== 1) {
             nextCell = this.numberCells[i][j];
-            if (nextCell.value === 0 || curCell.value === nextCell.value) {
+            if (nextCell.value === 1 || curCell.value === nextCell.value) {
               return true;
             }
           }
@@ -176,9 +178,9 @@ define(['number'], function(Number) {
       for (j = _i = 0; _i < 4; j = ++_i) {
         for (i = _j = 1; _j < 4; i = ++_j) {
           curCell = this.numberCells[i][j];
-          if (curCell.value !== 0) {
+          if (curCell.value !== 1) {
             nextCell = this.numberCells[i - 1][j];
-            if (nextCell.value === 0 || curCell.value === nextCell.value) {
+            if (nextCell.value === 1 || curCell.value === nextCell.value) {
               return true;
             }
           }
@@ -192,9 +194,9 @@ define(['number'], function(Number) {
       for (j = _i = 0; _i < 4; j = ++_i) {
         for (i = _j = 3; _j > 0; i = --_j) {
           curCell = this.numberCells[i - 1][j];
-          if (curCell.value !== 0) {
+          if (curCell.value !== 1) {
             nextCell = this.numberCells[i][j];
-            if (nextCell.value === 0 || curCell.value === nextCell.value) {
+            if (nextCell.value === 1 || curCell.value === nextCell.value) {
               return true;
             }
           }
@@ -210,7 +212,7 @@ define(['number'], function(Number) {
       }
       for (i = _i = 0; _i < 4; i = ++_i) {
         for (j = _j = 1; _j < 4; j = ++_j) {
-          if (this.numberCells[i][j].value !== 0) {
+          if (this.numberCells[i][j].value !== 1) {
             for (k = _k = 0; 0 <= j ? _k < j : _k > j; k = 0 <= j ? ++_k : --_k) {
               if (this.updateCell(i, j, i, k, moveCellAnimate)) {
                 break;
@@ -229,7 +231,7 @@ define(['number'], function(Number) {
       }
       for (i = _i = 0; _i < 4; i = ++_i) {
         for (j = _j = 2; _j >= 0; j = --_j) {
-          if (this.numberCells[i][j].value !== 0) {
+          if (this.numberCells[i][j].value !== 1) {
             for (k = _k = 3; 3 <= j ? _k < j : _k > j; k = 3 <= j ? ++_k : --_k) {
               if (this.updateCell(i, j, i, k, moveCellAnimate)) {
                 break;
@@ -248,7 +250,7 @@ define(['number'], function(Number) {
       }
       for (j = _i = 0; _i < 4; j = ++_i) {
         for (i = _j = 1; _j < 4; i = ++_j) {
-          if (this.numberCells[i][j].value !== 0) {
+          if (this.numberCells[i][j].value !== 1) {
             for (k = _k = 0; 0 <= i ? _k < i : _k > i; k = 0 <= i ? ++_k : --_k) {
               if (this.updateCell(i, j, k, j, moveCellAnimate)) {
                 break;
@@ -267,7 +269,7 @@ define(['number'], function(Number) {
       }
       for (j = _i = 0; _i < 4; j = ++_i) {
         for (i = _j = 2; _j >= 0; i = --_j) {
-          if (this.numberCells[i][j].value !== 0) {
+          if (this.numberCells[i][j].value !== 1) {
             for (k = _k = 3; 3 <= i ? _k < i : _k > i; k = 3 <= i ? ++_k : --_k) {
               if (this.updateCell(i, j, k, j, moveCellAnimate)) {
                 break;
