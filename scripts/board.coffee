@@ -5,8 +5,8 @@ define ['dist/number'], (Number) ->
 		gameLevel = level0: 0.1, level1: 0.5, level2: 0.9
 
 		constructor: (@level, localData) ->
-			@numberCells = []				# 存放二维数组
-			@numberCellHelper = []			# 一维数组, 动态存放值为0的数据块
+			@numberCells = []				# 存放二维数组(本地存储或初始化的数字块)
+			@numberCellHelper = []			# 一维数组, 动态存放值为1的数据块
 			@topNumberValue = 0				# 记录数据块最大值
 			
 			@score = 0						# 总分数
@@ -28,7 +28,7 @@ define ['dist/number'], (Number) ->
 						@numberCells[i][j] = new Number 1, i, j 			 
 
 		# generateOneNumber 职责不单一, 待优化
-		generateOneNumber: (showNumberAnimate) ->
+		outputNumberAndSaveProgress: (showNumberAnimate, saveProgress) ->
 			# 剩余的数字块的长度
 			availCellNum = @numberCellHelper.length
 			# 当没有剩余数字块时
@@ -40,11 +40,12 @@ define ['dist/number'], (Number) ->
 			randomCell.value = if Math.random() < gameLevel[@level] then 2 else 4
 			
 			# 传递随机数字块和游戏进度(数字分布和当前得分)
-			showNumberAnimate? randomCell, numberCells: @numberCells, curScore: @score
+			showNumberAnimate? randomCell
+			saveProgress? numberCells: @numberCells, curScore: @score
 			return true
 		
 		# 把每个数据在数据块内显示
-		updateAllcells: (showOneNumber) ->
+		updateAllCells: (showOneNumber) ->
 			@numberCellHelper = []							# 清空之前的内容
 			@addScore = 0									# 清空上次滑动获得的分数
 			for rowCells in @numberCells

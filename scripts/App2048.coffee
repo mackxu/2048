@@ -175,7 +175,8 @@ define ['dist/board'], (Board) ->
 				return
 			)
 			# 校正数据块视图
-			@board.updateAllcells( (numberCell) => 
+			@board.updateAllCells( (numberCell) => 
+				# 本回调函数用于绘制单个数字块
 				{ x, y, value } = numberCell
 				cellNode = $(@$numberCellViews[x * 4 + y])
 				cellNode.attr 'data-cell', numberCell.toString()
@@ -211,7 +212,7 @@ define ['dist/board'], (Board) ->
 		showOneNumber:() ->
 			# numberCell 要显示的数字块
 			# progress 将要存储到本地的游戏进度
-			@board.generateOneNumber( (numberCell, progress) =>
+			@board.outputNumberAndSaveProgress (numberCell) =>
 				# 动画显示一个数字块
 				{ x, y } = numberCell
 				$(@$numberCellViews[x * 4 + y])
@@ -228,17 +229,18 @@ define ['dist/board'], (Board) ->
 						top: @getPosTop(x, y)
 						left: @getPosLeft(x, y)
 					}, 50)
+				return
+			, (progress) =>
 				# 本地定时存储当前进度和当前得分 numberCells、curScore
 				clearTimeout localTimer					# 清除还没执行的定时器, localTimer是私有属性
-				localTimer = setTimeout( =>
+				localTimer = setTimeout( ->
 					localStorage.setItem gameProgress, JSON.stringify progress
 				, 1000)
 				return
-			)
 			return
 		
-		moveCell: (moveAction) ->
-			canMove = @board[moveAction]( => 
+		moveCell: (moveDirection) ->
+			canMove = @board[moveDirection]( => 
 				@showMoveNumber arguments
 				return
 			)
@@ -273,11 +275,10 @@ define ['dist/board'], (Board) ->
 
 		gameOver: () ->
 			# 不管成功或失败, 显示游戏结束时的视图
-			@board.gameOver( (goodWork, curScoreValue) =>
+			@board.gameOver( (goodWork, myScore) =>
 				# 记录最高得分到本地
-				if curScoreValue > @topScoreValue
-					localStorage.setItem('top-score', curScoreValue)
-					@$topScore.text curScoreValue
+				localStorage.setItem('top-score', myScore) if myScore > @topScoreValue
+					
 				# 显示结束界面
 				@$gridGameOver
 					.css( display: 'block' )
