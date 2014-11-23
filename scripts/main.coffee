@@ -9,7 +9,7 @@ require.config(
 			exports: 'jQuery'
 )
 
-require ['jQuery', 'App2048'], ($, App) ->
+require ['jQuery', 'dist/App2048'], ($, App) ->
 	$( ->
 		new App('level0')
 		return

@@ -1,4 +1,4 @@
-define ['board'], (Board) ->
+define ['dist/board'], (Board) ->
 	'use strict';
 
 	# 私有变量
@@ -65,6 +65,7 @@ define ['board'], (Board) ->
 				)
 
 			# 动态生成棋盘格
+			# 此处可以优化，用float布局
 			for i in [0...4]
 				for j in [0...4]
 					$(@$gridCells[4 * i + j]).css(

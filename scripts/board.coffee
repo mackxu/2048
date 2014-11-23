@@ -1,4 +1,4 @@
-define ['number'], (Number) ->
+define ['dist/number'], (Number) ->
 	'use strict';
 	class Board
 		maxNumber = 32768
