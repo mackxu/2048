@@ -36,8 +36,8 @@ define ['board'], (Board) ->
 		
 		# 让数字块自适应设备
 		createResponeBoard: () ->
-			# 用window.innerWidth替换window.screen.availwidth
-			documentWidth = window.innerWidth
+			# 选取viewport的最小宽度或高度，能让Board平铺屏幕
+			documentWidth = Math.min window.innerWidth, window.innerHeight
 			
 			# 移动设备的参数, 调整视图
 			if documentWidth < 500 
@@ -71,7 +71,6 @@ define ['board'], (Board) ->
 						top: @getPosTop(i, j)
 						left: @getPosLeft(i, j)
 					)
-
 			return
 
 		# 添加监听事件
