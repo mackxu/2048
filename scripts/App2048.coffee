@@ -6,6 +6,8 @@ define ['dist/board'], (Board) ->
 	localTimer = null 			# 本地存储游戏进度的定时器
 
 	startx = starty = endx = endy = 0
+	# 数字块运动的方向，对应(event.which - 37)
+	moveDirections = ['moveLeft', 'moveUp', 'moveRight', 'moveDown']
 	class App
 		# 获取页面元素, 添加事件监听器
 		constructor: (@level) ->
@@ -48,54 +50,35 @@ define ['dist/board'], (Board) ->
 
 				@cellFontSize = 40
 				# 棋盘外围框架
-				@$gridContainer.css({
+				@$gridContainer.css
 					width: @gridContainerWidth
 					height: @gridContainerWidth
-				})
 				# 棋盘格
-				@$gridCells.css(
+				@$gridCells.css
 					width: @cellSideLength
 					height: @cellSideLength
 					borderRadius: @borderRadius
-				)
 				# 调整遮罩的行高和圆角大小
-				@$gridGameOver.css(
+				@$gridGameOver.css
 					lineHeight: @gridContainerWidth + 'px'
 					borderRadius: @borderRadius
-				)
 
 			# 动态生成棋盘格
 			# 此处可以优化，用float布局
 			for i in [0...4]
 				for j in [0...4]
-					$(@$gridCells[4 * i + j]).css(
+					@$gridCells.eq(4 * i + j).css
 						top: @getPosTop(i, j)
 						left: @getPosLeft(i, j)
-					)
 			return
 
 		# 添加监听事件
 		initEvent: () ->
 			# PC端使用上下左右键盘
-			$(document).on('keydown', (e) =>
-				switch e.which
-					when 37
-						e.preventDefault()
-						@moveCell('moveLeft')
-					when 38
-						e.preventDefault()
-						@moveCell('moveUp')
-					when 39
-						e.preventDefault()
-						@moveCell('moveRight')
-					when 40
-						e.preventDefault()
-						@moveCell('moveDown')
-					else 
-						false
-			)
+			$(document).on 'keydown', $.proxy @keydownHandle, @
+			
 			# 为移动端添加touch事件
-			@$gridContainer.on(
+			@$gridContainer.on
 				touchstart: (e) =>
 					#
 					touches = e.originalEvent.targetTouches[0]
@@ -120,9 +103,10 @@ define ['dist/board'], (Board) ->
 				touchmove: (e) ->
 					e.preventDefault()
 					return
-			)
 
 			# 游戏从这里开始的, 用事件监听游戏开始
+			# 页面加载时 trigger startGame
+			# 用户点击时，重新游戏
 			@$gameover
 				.on('startGame', ( event, clicked ) =>
 					@startGame clicked
@@ -131,10 +115,20 @@ define ['dist/board'], (Board) ->
 				.on('click', ->
 					$(this).trigger 'startGame', [ true ]
 					return
-				).trigger 'startGame'						# 页面加载时, 游戏开始
+				).trigger 'startGame'					# 页面加载时, 游戏开始
 			return
 
 		weixinEvent: () ->
+			return
+		###
+		处理键盘事件
+		###
+		keydownHandle: (e) ->
+
+			e.preventDefault()
+			moveDirection = moveDirections[e.which - 37]
+			return false if moveDirection is undefined
+			@moveCell moveDirection
 			return
 
 		# 游戏开始
@@ -170,20 +164,20 @@ define ['dist/board'], (Board) ->
 			# 绘制游戏主面板
 			
 			# 刷新战绩榜
-			@board.updateScore((score) =>
+			@board.updateScore (score) =>
 				@$scoreView.text(score)
 				return
-			)
+
 			# 校正数据块视图
-			@board.updateAllCells( (numberCell) => 
+			@board.updateAllCells (numberCell) => 
 				# 本回调函数用于绘制单个数字块
 				{ x, y, value } = numberCell
-				cellNode = $(@$numberCellViews[x * 4 + y])
+				cellNode = @$numberCellViews.eq x * 4 + y
 				cellNode.attr 'data-cell', numberCell.toString()
 				[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 				
 				if value is 1
-					cellNode.css({
+					cellNode.text('').css
 						width: 0
 						height: 0
 						lineHeight: 'normal'
@@ -191,11 +185,10 @@ define ['dist/board'], (Board) ->
 						left: posX + @cellSideLength / 2
 						color: 'inherit'
 						backgroundColor: 'transparent'
-					}).text('')
 				else 
 					# 设置内容有2个汉字的数字块的字体大小26px 
 					fontSize = if value is 64 or value is 16384 then 0.8 * @cellFontSize else @cellFontSize
-					cellNode.css({
+					cellNode.text(numberCell.getText()).css
 						width: @cellSideLength
 						height: @cellSideLength
 						lineHeight: @cellSideLength + 'px'
@@ -204,9 +197,7 @@ define ['dist/board'], (Board) ->
 						left: posX
 						color: numberCell.getColor()
 						backgroundColor: numberCell.getBgColor() 
-					}).text(numberCell.getText())
 				return
-			)
 			return
 		
 		showOneNumber:() ->
@@ -215,7 +206,7 @@ define ['dist/board'], (Board) ->
 			@board.outputNumberAndSaveProgress (numberCell) =>
 				# 动画显示一个数字块
 				{ x, y } = numberCell
-				$(@$numberCellViews[x * 4 + y])
+				@$numberCellViews.eq(x * 4 + y)
 					.css({
 						lineHeight: @cellSideLength + 'px'
 						fontSize: @cellFontSize
@@ -223,12 +214,12 @@ define ['dist/board'], (Board) ->
 						backgroundColor: numberCell.getBgColor()
 					})
 					.text( numberCell.getText() )
-					.animate({
+					.animate
 						width: @cellSideLength
 						height: @cellSideLength
-						top: @getPosTop(x, y)
-						left: @getPosLeft(x, y)
-					}, 50)
+						top: @getPosTop x, y
+						left: @getPosLeft x, y
+						50
 				return
 			, (progress) =>
 				# 本地定时存储当前进度和当前得分 numberCells、curScore
@@ -240,32 +231,25 @@ define ['dist/board'], (Board) ->
 			return
 		
 		moveCell: (moveDirection) ->
-			canMove = @board[moveDirection]( => 
-				@showMoveNumber arguments
-				return
-			)
-			if canMove
+			# 数字块随手指滑动
+			moved = @board[moveDirection] $.proxy( @moveCellAnimate, @ )
+			
+			if moved is true
 				# 每次滑动后, 刷新棋盘格并生成新数字块
 				setTimeout( =>
 					@renderBoard()
 					@showOneNumber()			# 拥有50ms的动画
 					return			
 				, 300)
-				setTimeout( =>
-					@gameOver()
-					return			
-				, 380)	
+				# 每次滑动后判断游戏是否结束
+				setTimeout $.proxy( @gameOver, @ ), 380 	
 			return
 						
-		showMoveNumber: (moveCells) ->
-			start = moveCells[0]
-			end = moveCells[1]
-			
-			$(@$numberCellViews[4 * start.x + start.y])
-				.animate({
-					top: @getPosTop(end.x, end.y)
-					left: @getPosLeft(end.x, end.y)
-				}, 200)
+		moveCellAnimate: (start, end) ->
+			@$numberCellViews.eq(4 * start.x + start.y).animate
+				top: @getPosTop(end.x, end.y)
+				left: @getPosLeft(end.x, end.y)
+				200
 			return
 		getPosLeft: (i, j) ->
 			@cellSpace + j * (@cellSpace + @cellSideLength)
@@ -275,7 +259,7 @@ define ['dist/board'], (Board) ->
 
 		gameOver: () ->
 			# 不管成功或失败, 显示游戏结束时的视图
-			@board.gameOver( (goodWork, myScore) =>
+			@board.gameOver (goodWork, myScore) =>
 				# 记录最高得分到本地
 				localStorage.setItem('top-score', myScore) if myScore > @topScoreValue
 					
@@ -285,6 +269,5 @@ define ['dist/board'], (Board) ->
 					.text if goodWork then 'You Win!' else 'You Lose!'
 				localStorage.setItem 'isGameOver', 1
 				return
-			)
 			return
 	return App
