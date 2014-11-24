@@ -144,7 +144,7 @@ define ['dist/board'], (Board) ->
 			# 玩家点击开始游戏时, 隐藏遮罩
 			clicked and @$gridGameOver.hide()
 			
-			# 如果存在本地存储的最高得分记录, 就显示出来
+			# 更新游戏最高记录
 			@topScoreValue = localStorage.getItem(localTopScore) | 0
 			@$topScore.text @topScoreValue if @topScoreValue isnt 0
 			
