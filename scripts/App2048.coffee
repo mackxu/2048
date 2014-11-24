@@ -6,6 +6,8 @@ define ['dist/board'], (Board) ->
 	localTimer = null 			# 本地存储游戏进度的定时器
 
 	startx = starty = endx = endy = 0
+	# 数字块运动的方向，对应(event.which - 37)
+	moveDirections = ['moveLeft', 'moveUp', 'moveRight', 'moveDown']
 	class App
 		# 获取页面元素, 添加事件监听器
 		constructor: (@level) ->
@@ -78,21 +80,11 @@ define ['dist/board'], (Board) ->
 		initEvent: () ->
 			# PC端使用上下左右键盘
 			$(document).on('keydown', (e) =>
-				switch e.which
-					when 37
-						e.preventDefault()
-						@moveCell('moveLeft')
-					when 38
-						e.preventDefault()
-						@moveCell('moveUp')
-					when 39
-						e.preventDefault()
-						@moveCell('moveRight')
-					when 40
-						e.preventDefault()
-						@moveCell('moveDown')
-					else 
-						false
+				e.preventDefault()
+				moveDirection = moveDirections[e.which - 37]
+				return false if moveDirection is undefined
+				@moveCell moveDirection
+				return
 			)
 			# 为移动端添加touch事件
 			@$gridContainer.on(
@@ -131,7 +123,7 @@ define ['dist/board'], (Board) ->
 				.on('click', ->
 					$(this).trigger 'startGame', [ true ]
 					return
-				).trigger 'startGame'						# 页面加载时, 游戏开始
+				).trigger 'startGame'					# 页面加载时, 游戏开始
 			return
 
 		weixinEvent: () ->
