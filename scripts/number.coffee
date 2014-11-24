@@ -12,19 +12,19 @@ define () ->
 		constructor: (@value, @x, @y) ->
 			 @merged = false
 		
-		getColor: () ->
+		getColor: ->
 			if @value <= 4 then '#776e65' else '#fff';
 		
 		# 根据数值，返回背景色
-		getBgColor: () ->
+		getBgColor: ->
 			bgColors[Math.ceil Math.log2(@value)]
 		# 根据数据值返回文本
-		getText: () ->
+		getText: ->
 			dynasty[Math.ceil Math.log2(@value)]
-		getFontSize: () ->
+		getFontSize: ->
 			if @value is 64 or @value is 16384 then 49 else 60
 		# 当对象需要转换为字符串时, 调用该方法
-		toString: () ->
+		toString: ->
 			# 属性merge的值的改变是在两次滑动动作之间，因此在结构上看到的永远是false
-			JSON.stringify(@)
+			JSON.stringify @
 		

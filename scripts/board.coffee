@@ -1,9 +1,9 @@
 define ['dist/number'], (Number) ->
 	'use strict';
-	class Board
-		maxNumber = 32768
-		gameLevel = level0: 0.1, level1: 0.5, level2: 0.9
+	maxNumber = 32768
+	gameLevel = level0: 0.1, level1: 0.5, level2: 0.9
 
+	class Board
 		constructor: (@level, localData) ->
 			@numberCells = []				# 存放二维数组(本地存储或初始化的数字块)
 			@numberCellHelper = []			# 一维数组, 动态存放值为1的数据块
@@ -11,8 +11,11 @@ define ['dist/number'], (Number) ->
 			
 			@score = 0						# 总分数
 			@addScore = 0					# 存储一次滑动得到的分数
-			
-			# 初始化棋盘数字
+			###
+			初始化数字块
+			存在本地游戏数据
+			或设置默认值
+			###
 			if localData
 				@score = localData.curScore	# 本地的分数
 				for rowCells, i in localData.numberCells
@@ -40,12 +43,12 @@ define ['dist/number'], (Number) ->
 			randomCell.value = if Math.random() < gameLevel[@level] then 2 else 4
 			
 			# 传递随机数字块和游戏进度(数字分布和当前得分)
-			showNumberAnimate? randomCell
-			saveProgress? numberCells: @numberCells, curScore: @score
+			showNumberAnimate randomCell
+			saveProgress numberCells: @numberCells, curScore: @score
 			return true
 		
 		# 把每个数据在数据块内显示
-		updateAllCells: (showOneNumber) ->
+		updateAllCells: (showNumber) ->
 			@numberCellHelper = []							# 清空之前的内容
 			@addScore = 0									# 清空上次滑动获得的分数
 			for rowCells in @numberCells
@@ -53,11 +56,10 @@ define ['dist/number'], (Number) ->
 					cell.merged = false
 					# 存放值为1的数字块对象
 					@numberCellHelper.push(cell) if cell.value is 1
-					showOneNumber cell
+					showNumber cell
 			return
 		
 		updateCell: (fx, fy, tx, ty, moveCellAnimate) ->
-			# 如果两个数字块相等
 			startCell = @numberCells[fx][fy]
 			targetCell = @numberCells[tx][ty]
 			isSameCell = startCell.value is targetCell.value
@@ -80,12 +82,13 @@ define ['dist/number'], (Number) ->
 			return false
 		
 		updateScore: (updateScoreView) ->
-			# 更新战绩榜
+			# 更新战绩榜, 此处可以添加动画效果
 			if @addscore isnt 0
 				@score += @addScore
 				updateScoreView @score
 			return
 		
+		# 如果from到to通路返回true、否者返回false
 		noBlock: (fx, fy, tx, ty) ->
 			if fy is ty
 				if fx < tx then fx += 1 else fx -= 1
@@ -98,7 +101,7 @@ define ['dist/number'], (Number) ->
 					return false if @numberCells[fx][y].value isnt 1
 			return true
 
-		canMoveLeft: () ->
+		canMoveLeft: ->
 			# 向左滑动前，检查是否能滑动
 			# 滑动规定：1. 2.
 			for i in [0...4]
@@ -110,7 +113,7 @@ define ['dist/number'], (Number) ->
 							return true 
 			return false
 						
-		canMoveRight: () ->
+		canMoveRight: ->
 			for i in [0...4]
 				for j in [3...0]
 					curCell = @numberCells[i][j-1]
@@ -119,7 +122,7 @@ define ['dist/number'], (Number) ->
 						if nextCell.value is 1 or curCell.value is nextCell.value
 							return true 
 			return false
-		canMoveUp: () ->
+		canMoveUp: ->
 			for j in [0...4]
 				for i in [1...4]			
 					curCell = @numberCells[i][j]
@@ -128,7 +131,7 @@ define ['dist/number'], (Number) ->
 						if nextCell.value is 1 or curCell.value is nextCell.value
 							return true
 			return false
-		canMoveDown: () ->
+		canMoveDown: ->
 			for j in [0...4]
 				for i in [3...0]			
 					curCell = @numberCells[i-1][j]

@@ -50,30 +50,26 @@ define ['dist/board'], (Board) ->
 
 				@cellFontSize = 40
 				# 棋盘外围框架
-				@$gridContainer.css({
+				@$gridContainer.css
 					width: @gridContainerWidth
 					height: @gridContainerWidth
-				})
 				# 棋盘格
-				@$gridCells.css(
+				@$gridCells.css
 					width: @cellSideLength
 					height: @cellSideLength
 					borderRadius: @borderRadius
-				)
 				# 调整遮罩的行高和圆角大小
-				@$gridGameOver.css(
+				@$gridGameOver.css
 					lineHeight: @gridContainerWidth + 'px'
 					borderRadius: @borderRadius
-				)
 
 			# 动态生成棋盘格
 			# 此处可以优化，用float布局
 			for i in [0...4]
 				for j in [0...4]
-					$(@$gridCells[4 * i + j]).css(
+					@$gridCells.eq(4 * i + j).css
 						top: @getPosTop(i, j)
 						left: @getPosLeft(i, j)
-					)
 			return
 
 		# 添加监听事件
@@ -82,7 +78,7 @@ define ['dist/board'], (Board) ->
 			$(document).on 'keydown', $.proxy @keydownHandle, @
 			
 			# 为移动端添加touch事件
-			@$gridContainer.on(
+			@$gridContainer.on
 				touchstart: (e) =>
 					#
 					touches = e.originalEvent.targetTouches[0]
@@ -107,7 +103,6 @@ define ['dist/board'], (Board) ->
 				touchmove: (e) ->
 					e.preventDefault()
 					return
-			)
 
 			# 游戏从这里开始的, 用事件监听游戏开始
 			# 页面加载时 trigger startGame
@@ -169,20 +164,20 @@ define ['dist/board'], (Board) ->
 			# 绘制游戏主面板
 			
 			# 刷新战绩榜
-			@board.updateScore((score) =>
+			@board.updateScore (score) =>
 				@$scoreView.text(score)
 				return
-			)
+
 			# 校正数据块视图
-			@board.updateAllCells( (numberCell) => 
+			@board.updateAllCells (numberCell) => 
 				# 本回调函数用于绘制单个数字块
 				{ x, y, value } = numberCell
-				cellNode = $(@$numberCellViews[x * 4 + y])
+				cellNode = @$numberCellViews.eq x * 4 + y
 				cellNode.attr 'data-cell', numberCell.toString()
 				[posX, posY] = [@getPosLeft(x, y), @getPosTop(x, y)]
 				
 				if value is 1
-					cellNode.css({
+					cellNode.text('').css
 						width: 0
 						height: 0
 						lineHeight: 'normal'
@@ -190,11 +185,10 @@ define ['dist/board'], (Board) ->
 						left: posX + @cellSideLength / 2
 						color: 'inherit'
 						backgroundColor: 'transparent'
-					}).text('')
 				else 
 					# 设置内容有2个汉字的数字块的字体大小26px 
 					fontSize = if value is 64 or value is 16384 then 0.8 * @cellFontSize else @cellFontSize
-					cellNode.css({
+					cellNode.text(numberCell.getText()).css
 						width: @cellSideLength
 						height: @cellSideLength
 						lineHeight: @cellSideLength + 'px'
@@ -203,9 +197,7 @@ define ['dist/board'], (Board) ->
 						left: posX
 						color: numberCell.getColor()
 						backgroundColor: numberCell.getBgColor() 
-					}).text(numberCell.getText())
 				return
-			)
 			return
 		
 		showOneNumber:() ->
@@ -214,7 +206,7 @@ define ['dist/board'], (Board) ->
 			@board.outputNumberAndSaveProgress (numberCell) =>
 				# 动画显示一个数字块
 				{ x, y } = numberCell
-				$(@$numberCellViews[x * 4 + y])
+				@$numberCellViews.eq(x * 4 + y)
 					.css({
 						lineHeight: @cellSideLength + 'px'
 						fontSize: @cellFontSize
@@ -222,12 +214,12 @@ define ['dist/board'], (Board) ->
 						backgroundColor: numberCell.getBgColor()
 					})
 					.text( numberCell.getText() )
-					.animate({
+					.animate
 						width: @cellSideLength
 						height: @cellSideLength
-						top: @getPosTop(x, y)
-						left: @getPosLeft(x, y)
-					}, 50)
+						top: @getPosTop x, y
+						left: @getPosLeft x, y
+						50
 				return
 			, (progress) =>
 				# 本地定时存储当前进度和当前得分 numberCells、curScore
@@ -254,11 +246,10 @@ define ['dist/board'], (Board) ->
 			return
 						
 		moveCellAnimate: (start, end) ->
-			$(@$numberCellViews[4 * start.x + start.y])
-				.animate({
-					top: @getPosTop(end.x, end.y)
-					left: @getPosLeft(end.x, end.y)
-				}, 200)
+			@$numberCellViews.eq(4 * start.x + start.y).animate
+				top: @getPosTop(end.x, end.y)
+				left: @getPosLeft(end.x, end.y)
+				200
 			return
 		getPosLeft: (i, j) ->
 			@cellSpace + j * (@cellSpace + @cellSideLength)
@@ -268,7 +259,7 @@ define ['dist/board'], (Board) ->
 
 		gameOver: () ->
 			# 不管成功或失败, 显示游戏结束时的视图
-			@board.gameOver( (goodWork, myScore) =>
+			@board.gameOver (goodWork, myScore) =>
 				# 记录最高得分到本地
 				localStorage.setItem('top-score', myScore) if myScore > @topScoreValue
 					
@@ -278,6 +269,5 @@ define ['dist/board'], (Board) ->
 					.text if goodWork then 'You Win!' else 'You Lose!'
 				localStorage.setItem 'isGameOver', 1
 				return
-			)
 			return
 	return App
