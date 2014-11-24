@@ -79,13 +79,8 @@ define ['dist/board'], (Board) ->
 		# 添加监听事件
 		initEvent: () ->
 			# PC端使用上下左右键盘
-			$(document).on('keydown', (e) =>
-				e.preventDefault()
-				moveDirection = moveDirections[e.which - 37]
-				return false if moveDirection is undefined
-				@moveCell moveDirection
-				return
-			)
+			$(document).on 'keydown', $.proxy @keydownHandle, @
+			
 			# 为移动端添加touch事件
 			@$gridContainer.on(
 				touchstart: (e) =>
@@ -115,6 +110,8 @@ define ['dist/board'], (Board) ->
 			)
 
 			# 游戏从这里开始的, 用事件监听游戏开始
+			# 页面加载时 trigger startGame
+			# 用户点击时，重新游戏
 			@$gameover
 				.on('startGame', ( event, clicked ) =>
 					@startGame clicked
@@ -127,6 +124,16 @@ define ['dist/board'], (Board) ->
 			return
 
 		weixinEvent: () ->
+			return
+		###
+		处理键盘事件
+		###
+		keydownHandle: (e) ->
+
+			e.preventDefault()
+			moveDirection = moveDirections[e.which - 37]
+			return false if moveDirection is undefined
+			@moveCell moveDirection
 			return
 
 		# 游戏开始
@@ -232,27 +239,21 @@ define ['dist/board'], (Board) ->
 			return
 		
 		moveCell: (moveDirection) ->
-			canMove = @board[moveDirection]( => 
-				@showMoveNumber arguments
-				return
-			)
-			if canMove
+			# 数字块随手指滑动
+			moved = @board[moveDirection] $.proxy( @moveCellAnimate, @ )
+			
+			if moved is true
 				# 每次滑动后, 刷新棋盘格并生成新数字块
 				setTimeout( =>
 					@renderBoard()
 					@showOneNumber()			# 拥有50ms的动画
 					return			
 				, 300)
-				setTimeout( =>
-					@gameOver()
-					return			
-				, 380)	
+				# 每次滑动后判断游戏是否结束
+				setTimeout $.proxy( @gameOver, @ ), 380 	
 			return
 						
-		showMoveNumber: (moveCells) ->
-			start = moveCells[0]
-			end = moveCells[1]
-			
+		moveCellAnimate: (start, end) ->
 			$(@$numberCellViews[4 * start.x + start.y])
 				.animate({
 					top: @getPosTop(end.x, end.y)
