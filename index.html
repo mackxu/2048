@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <link rel="dns-prefetch" href="http://qn2048.qiniudn.com">
     <title>浪淘沙2048</title>
-    <link rel="stylesheet" type="text/css" href="http://qn2048.qiniudn.com/css/2048.css" />  
+    <link rel="dns-prefetch" href="http://qn2048.qiniudn.com">
+    <link rel="stylesheet" href="http://qn2048.qiniudn.com/css/2048.css" />  
 </head>
 <body>
-    <header>
+	<header>
         <h1>浪淘沙2048</h1>
         <a href="javascript:;" id="J_gamestart">New Game</a>
         <p><span>当前得分: <b id="J_cur-score">0</b></span>&nbsp;&nbsp;
@@ -60,7 +60,26 @@
     </div>
     <!-- // 棋盘格结束 -->
     <div class="loading" id="J_loading"><h2>加载中...</h2></div>
-    <!-- // 资源加载时要显示的页面 -->
-	<script src="http://qn2048.qiniudn.com/require.js" data-main="http://qn2048.qiniudn.com/scripts/main.js"></script>
+    <!-- // 页面初始化要显示的界面 -->
+	<script src="http://qn2048.qiniudn.com/require.js"></script>
+    <script>
+    require.config({
+      baseUrl: 'http://qn2048.qiniudn.com/scripts',
+      paths: {
+        jQuery: 'lib/jquery-1.9.0'
+      },
+      shim: {
+        jQuery: {
+          exports: 'jQuery'
+        }
+      }
+    });
+
+    require(['jQuery', 'dist/App2048'], function($, App) {
+      $(function() {
+        new App('level0');
+      });
+    });
+    </script>
 </body>
 </html>
