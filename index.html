@@ -60,6 +60,25 @@
     <!-- // 棋盘格结束 -->
     <div class="loading" id="J_loading"><h2>加载中...</h2></div>
     <!-- // 页面初始化要显示的界面 -->
-	<script type="text/javascript" src="require.js" data-main="scripts/dist/main.js"></script>
+	<script src="require.js"></script>
+    <script>
+    require.config({
+      baseUrl: './scripts',
+      paths: {
+        jQuery: 'lib/jquery-1.9.0'
+      },
+      shim: {
+        jQuery: {
+          exports: 'jQuery'
+        }
+      }
+    });
+
+    require(['jQuery', 'dist/App2048'], function($, App) {
+      $(function() {
+        new App('level0');
+      });
+    });
+    </script>
 </body>
 </html>
